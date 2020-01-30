@@ -9,11 +9,13 @@ const Discord = require('discord.js'),
 var commands = {},
     command  = require('./command.js');
 
+// Get all .js files in the ./commands/ directory and register them as a command
 var filePath = path.join(__dirname, "commands");
 fs.readdirSync(filePath).filter(file => file.endsWith('.js')).forEach(function(file) {
   commands[file.split(".")[0]] = require('./commands/'+file);
 });
-console.log(commands);
+console.log(commands); // View registered commands and their function(s) in console
+
 client.on('ready', () => {
   console.log(
     `Logged in as ${client.user.tag}!
