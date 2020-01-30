@@ -8,11 +8,18 @@ const Discord = require('discord.js'),
 
 var commands = {},
     command  = require('./command.js');
-
+function getDirectories(path) {
+  return fs.readdirSync(path).filter(function (file) {
+    return fs.statSync(path+'/'+file).isDirectory();
+  });
+}
 // Get all .js files in the ./commands/ directory and register them as a command
 var filePath = path.join(__dirname, "commands");
+
 fs.readdirSync(filePath).filter(file => file.endsWith('.js')).forEach(function(file) {
   commands[file.split(".")[0]] = require('./commands/'+file);
+  // get each directory in path and then for each directory get files and add
+console.log(getDirectories(filePath));
 });
 console.log(commands); // View registered commands and their function(s) in console
 
