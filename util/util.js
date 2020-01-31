@@ -70,8 +70,17 @@ function writeJSONToFile(data, pathToFile) {
 ** Description: Get a server's prefix
 ** Comment:
 */
+function getServerJSON(id) {
+  return `${datapath}/server/${id}.json`;
+}
+
+/*
+** getServerPrefix()
+** Description: Get a server's prefix
+** Comment:
+*/
 function getServerPrefix(id) {
-  var json = JSONFromFile(`${datapath}/server/${id}.json`);
+  var json = JSONFromFile(getServerJSON(id));
   return json.prefix;
 }
 
@@ -81,12 +90,39 @@ function getServerPrefix(id) {
 ** Comment:
 */
 function setServerPrefix(id, prefix) {
-  var path = `${datapath}/server/${id}.json`
+  var path = getServerJSON(id);
   var json = JSONFromFile(path);
   json.prefix = prefix;
   writeJSONToFile(json, path);
 }
 
+/*
+** addCommand()
+** Description: Add custom command to server
+** Comment:
+*/
+function addCommand(id, name, text) {
+  var path = getServerJSON(id);
+  var json = JSONFromFile(path);
+  json.commands[`${name}`] = text;
+  writeJSONToFile(json, path);
+}
+
+/*
+** getServerPrefix()
+** Description: Get a server's prefix
+** Comment:
+*/
+function deleteCommand(id, name) {
+  var path = getServerJSON(id);
+  var json = JSONFromFile(path);
+  delete json.commands[name];
+  writeJSONToFile(json, path);
+}
+
+exports.getServerJSON = getServerJSON;
+exports.addCommand = addCommand;
+exports.deleteCommand = deleteCommand;
 exports.getServerPrefix = getServerPrefix;
 exports.setServerPrefix = setServerPrefix;
 exports.JSONFromFile = JSONFromFile;

@@ -1,5 +1,6 @@
-var name = "",
-    args = [];
+var name = "", // Current command name
+    args = []; // All arguments of current command
+    list = {}; // List of all commands in the bot
 
 const set = (message) => {
   name = message.content.split(util.getServerPrefix(message.guild.id))[1].split(" ")[0];
@@ -18,7 +19,16 @@ const getName = () => {
 const getArgs = () => {
   return args;
 }
+const setList = (list) => {
+  this.list = list;
+}
+const getList = () => {
+  return list;
+}
+
 exports.set = set;
 exports.get = get;
 exports.getName = getName;
 exports.getArgs = getArgs;
+exports.getList = getList;
+exports.setList = setList;
