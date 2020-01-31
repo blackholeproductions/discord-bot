@@ -1,4 +1,5 @@
 const md5 = require('md5');
+      fs  = require('fs');
 /*
 ** hashCode()
 ** Description: Turns a string into a number (same output for same string)
@@ -27,17 +28,9 @@ function timestamp() {
     }
     return num;
   }
-
   var today = new Date();
 
-  var hours = format(today.getHours());
-  var minutes = format(today.getMinutes());
-  var seconds = format(today.getSeconds());
-  var month = format(today.getMonth()+1);
-  var day = format(today.getDate());
-  var year = today.getFullYear();
-
-  return `[${year}-${month}-${day} ${hours}:${minutes}:${seconds}]`;
+  return `[${today.getFullYear()}-${format(today.getMonth()+1)}-${format(today.getDate())} ${format(today.getHours())}:${format(today.getMinutes())}:${format(today.getSeconds())}]`;
 }
 
 /*
@@ -53,6 +46,51 @@ function cmdCount() {
   return count;
 }
 
+/*
+** JSONFromFile()
+** Description: gets json data from file as object
+** Comment:
+*/
+function JSONFromFile(pathToFile) {
+  var data = fs.readFileSync(pathToFile);
+  return JSON.parse(data);
+}
+
+/*
+** writeJSONToFile()
+** Description: write json to file
+** Comment:
+*/
+function writeJSONToFile(data, pathToFile) {
+  fs.writeFileSync(pathToFile, JSON.stringify(data, null, 2)); // "null, 2" makes the file humanly readable ig
+}
+
+/*
+** getServerPrefix()
+** Description: Get a server's prefix
+** Comment:
+*/
+function getServerPrefix(id) {
+  var json = JSONFromFile(`${datapath}/server/${id}.json`);
+  return json.prefix;
+}
+
+/*
+** getServerPrefix()
+** Description: Get a server's prefix
+** Comment:
+*/
+function setServerPrefix(id, prefix) {
+  var path = `${datapath}/server/${id}.json`
+  var json = JSONFromFile(path);
+  json.prefix = prefix;
+  writeJSONToFile(json, path);
+}
+
+exports.getServerPrefix = getServerPrefix;
+exports.setServerPrefix = setServerPrefix;
+exports.JSONFromFile = JSONFromFile;
+exports.writeJSONToFile = writeJSONToFile;
 exports.cmdCount = cmdCount;
 exports.timestamp = timestamp;
 exports.hashCode = hashCode;

@@ -1,2 +1,2 @@
 # discord-bot
-my
+it's cool bot that does cool bot things

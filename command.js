@@ -2,7 +2,7 @@ var name = "",
     args = [];
 
 const set = (message) => {
-  name = message.content.split(config.prefix)[1].split(" ")[0];
+  name = message.content.split(util.getServerPrefix(message.guild.id))[1].split(" ")[0];
   // Check if command has arguments, set args if so
   if (message.content.split(" ").length-1 > 0) {
     args = message.content.split(name+" ")[1].split(" ");
