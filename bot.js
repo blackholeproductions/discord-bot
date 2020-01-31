@@ -1,26 +1,34 @@
+global.__basedir = __dirname; // global variable that stores base directory
 const Discord = require('discord.js'),
       client  = new Discord.Client(),
       config  = require("./config.js"),
       path    = require('path'),
       fs      = require('fs'),
-      util    = require("./commands/util/util.js"),
+      util    = require("./util/util.js"),
       md5     = require('md5');
 
 var commands = {},
     command  = require('./command.js');
-function getDirectories(path) {
-  return fs.readdirSync(path).filter(function (file) {
-    return fs.statSync(path+'/'+file).isDirectory();
-  });
-}
-// Get all .js files in the ./commands/ directory and register them as a command
+// Get all .js files recursively in the ./commands/ directory and register them as a command
 var filePath = path.join(__dirname, "commands");
 
-fs.readdirSync(filePath).filter(file => file.endsWith('.js')).forEach(function(file) {
-  commands[file.split(".")[0]] = require('./commands/'+file);
-  // get each directory in path and then for each directory get files and add
-console.log(getDirectories(filePath));
+function readFiles(dir, filelist) {
+  var files = fs.readdirSync(dir); // Get list of files
+  filelist = filelist || [];
+  files.forEach(function(file) {
+    if (fs.statSync(path.join(dir, file)).isDirectory()) {
+      filelist = readFiles(path.join(dir, file), filelist); // For each directory, add the files (and any further directories files) to the list.
+    } else {
+      filelist.push(path.join(dir, file)); // Pass absolute path into list
+    }
+  });
+  return filelist;
+};
+
+readFiles(filePath).filter(file => file.endsWith('.js')).forEach(function(file) {
+  commands[file.split(".")[0]] = require(file);
 });
+
 console.log(commands); // View registered commands and their function(s) in console
 
 client.on('ready', () => {
