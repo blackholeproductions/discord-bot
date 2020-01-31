@@ -1,14 +1,14 @@
 global.__basedir = __dirname; // global variable that stores base directory
+global.commands = {};
+global.config = require("./config.js");
 const Discord = require('discord.js'),
       client  = new Discord.Client(),
-      config  = require("./config.js"),
       path    = require('path'),
       fs      = require('fs'),
       util    = require("./util/util.js"),
       md5     = require('md5');
 
-var commands = {},
-    command  = require('./command.js');
+var command = require('./command.js');
 // Get all .js files recursively in the ./commands/ directory and register them as a command
 var filePath = path.join(__dirname, "commands");
 
@@ -26,7 +26,7 @@ function readFiles(dir, filelist) {
 };
 
 readFiles(filePath).filter(file => file.endsWith('.js')).forEach(function(file) {
-  commands[file.split(".")[0]] = require(file);
+  commands[file.split("/")[file.split("/").length-1].split(".")[0]] = require(file); // Remove directory to get just the command name
 });
 
 console.log(commands); // View registered commands and their function(s) in console
