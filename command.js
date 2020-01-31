@@ -1,4 +1,3 @@
-const config = require("./config.js");
 var name = "",
     args = [];
 
@@ -8,7 +7,7 @@ const set = (message) => {
   if (message.content.split(" ").length-1 > 0) {
     args = message.content.split(name+" ")[1].split(" ");
   }
-  console.log(`${message.author.username} ran the command ${name}`);
+  console.log(`${util.timestamp()} ${message.author.username} ran the command ${name}`);
 };
 const get = () => {
   return `name: ${name}\nargs: ${args} (${args.length})`;

@@ -1,11 +1,11 @@
 global.__basedir = __dirname; // global variable that stores base directory
 global.commands = {};
 global.config = require("./config.js");
+global.util = require("./util/util.js");
 const Discord = require('discord.js'),
       client  = new Discord.Client(),
       path    = require('path'),
       fs      = require('fs'),
-      util    = require("./util/util.js"),
       md5     = require('md5');
 
 var command = require('./command.js');
@@ -34,8 +34,9 @@ console.log(commands); // View registered commands and their function(s) in cons
 client.on('ready', () => {
   console.log(
     `Logged in as ${client.user.tag}!
-    I'm in ${client.guilds.size} servers with ${client.users.size} users in ${client.channels.size} channels.`
+     I'm in ${client.guilds.size} servers with ${client.users.size} users in ${client.channels.size} channels serving ${util.cmdCount()} commands!`
   );
+  client.guilds.get("587038554539032577").channels.get("612021603261480969").send("i started woo"); // send message to bot-brain channel
 });
 
 client.on('message', message => {

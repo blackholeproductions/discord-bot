@@ -6,5 +6,6 @@ const execute = (message, command) => {
   }
   message.channel.send(draft);
 }
+
 exports.desc = desc;
 exports.execute = execute;
