@@ -1,4 +1,5 @@
-const desc = "Sets the prefix of the server";
+const desc = "Sets the prefix of the server",
+      args = "<prefix>";
 const execute = (message, command) => {
   if (command.getArgs().length != 1) {
     message.channel.send("You must provide a prefix for me to set it to.");
@@ -13,5 +14,7 @@ const execute = (message, command) => {
   }
 
 }
+
+exports.args = args;
 exports.desc = desc;
 exports.execute = execute;

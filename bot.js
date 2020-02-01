@@ -30,7 +30,8 @@ function readFiles(dir, filelist) {
 readFiles(filePath).filter(file => file.endsWith('.js')).forEach(function(file) {
   var name = file.split("/")[file.split("/").length-1].split(".")[0]; // Remove directory to get just the command name
   commands[name] = require(file);
-  commands[name].path = file; // Save the filepath to commands.paths
+  commands[name].path = file; // Save the filepath in the command
+  if (commands[name].args == undefined) commands[name].args = ""; // if the command doesn't specify arguments, set it to nothing so js doesn't scream undefined at me
 });
 
 console.log(commands); // View registered commands and their function(s) in console

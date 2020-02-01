@@ -1,6 +1,7 @@
 const util = require(__basedir+"/util/util.js"),
-      md5  = require("md5");
-      desc = "Rate a waifu";
+      md5  = require("md5"),
+      desc = "Rate a waifu",
+      args = "<waifu>";
 // from old bot, maybe rewrite later (now partially rewritten)
 const execute = (message, command) => {
   if (command.getArgs().length == 1) {
@@ -22,5 +23,7 @@ const execute = (message, command) => {
     if (shipPercentA == "8") message.channel.send("i would give `" + command.getArgs()[0] + "` an **" + shipPercentA + "/" + denominator + "**");
   }
 }
+
+exports.args = args;
 exports.desc = desc;
 exports.execute = execute;

@@ -1,4 +1,6 @@
 const desc = "Get a list of commands";
+      args = "<page>";
+
 const execute = (message, command) => {
   var page       = parseInt(command.getArgs()[0])-1,                                 // page number
       pageSize   = 10,                                                               // size of each page
@@ -50,9 +52,9 @@ const execute = (message, command) => {
     if (cmdlist[command].category !== "") {
       if (categories[`${cmdlist[command].category}`] == undefined) categories[`${cmdlist[command].category}`] = {}; // if it doesnt exist create it cus nested objects are cancer
       categories[`${cmdlist[command].category}`][command] = cmdlist[command];
+    } else {
+      draft += `**${prefix}${command} ${commands[command].args}** - ${cmdlist[command].description}\n`;
     }
-
-    draft += `**${prefix}${command}** - ${cmdlist[command].description}\n`;
 
   }
 
@@ -62,7 +64,7 @@ const execute = (message, command) => {
   for (var category in categories) {
     categoryDraft += `  --- **${category} commands** ---\n`;
     for (var command in categories[category]) {
-      categoryDraft += `  **${prefix}${command}** - ${categories[category][command].description}\n`;
+      categoryDraft += `  **${prefix}${command} ${commands[command].args}** - ${categories[category][command].description}\n`;
     }
   }
   if (categoryDraft !== "" && draft !== "") {
@@ -86,5 +88,6 @@ const execute = (message, command) => {
   message.channel.send(draft);
 }
 
+exports.args = args;
 exports.desc = desc;
 exports.execute = execute;

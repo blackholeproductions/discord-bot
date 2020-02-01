@@ -1,4 +1,5 @@
-const desc = "Set a custom command's description";
+const desc = "Set a custom command's description",
+      args = "<cmdname> <description>";
 const execute = (message, command) => {
   if (command.getArgs().length < 2) {
     message.channel.send("You must provide a command and the description to set.");
@@ -19,5 +20,7 @@ const execute = (message, command) => {
     }
   }
 }
+
+exports.args = args;
 exports.desc = desc;
 exports.execute = execute;

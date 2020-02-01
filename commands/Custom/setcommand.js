@@ -1,4 +1,5 @@
-const desc = "Set a custom command to say whatever you want";
+const desc = "Set a custom command to say whatever you want",
+      args = "<cmdname> <response>";
 const execute = (message, command) => {
   if (command.getArgs().length < 2) {
     message.channel.send("You must provide a command and the text to output.");
@@ -21,5 +22,7 @@ const execute = (message, command) => {
     }
   }
 }
+
+exports.args = args;
 exports.desc = desc;
 exports.execute = execute;

@@ -1,4 +1,5 @@
-const desc = "Delete a custom command";
+const desc = "Delete a custom command",
+      args = "<cmdname>";
 const execute = (message, command) => {
   if (command.getArgs().length != 1) {
     message.channel.send("You must provide a command to delete.");
@@ -16,5 +17,7 @@ const execute = (message, command) => {
 
   }
 }
+
+exports.args = args;
 exports.desc = desc;
 exports.execute = execute;
