@@ -1,6 +1,7 @@
 global.__basedir = __dirname; // global variable that stores base directory
 global.datapath = `${__basedir}/data`;
 global.commands = {};
+global.cmdpaths = {};
 global.config = require("./config.js");
 global.util = require("./util/util.js");
 const Discord = require('discord.js'),
@@ -27,22 +28,25 @@ function readFiles(dir, filelist) {
 };
 
 readFiles(filePath).filter(file => file.endsWith('.js')).forEach(function(file) {
-  commands[file.split("/")[file.split("/").length-1].split(".")[0]] = require(file); // Remove directory to get just the command name
+  var name = file.split("/")[file.split("/").length-1].split(".")[0]; // Remove directory to get just the command name
+  commands[name] = require(file);
+  commands[name].path = file; // Save the filepath to commands.paths
 });
 
 console.log(commands); // View registered commands and their function(s) in console
-command.setList(commands); // Add commands to command.js so all bot commands have access to a list
 
 client.on('ready', () => {
   var startMessage = `**${util.timestamp()}** Logged in as *${client.user.tag}*!\nI'm in ${client.guilds.size} servers with ${client.users.size} users in ${client.channels.size} channels serving ${util.cmdCount()} commands!`;
   client.guilds.get("587038554539032577").channels.get("612021603261480969").send(startMessage); // send message to bot-brain channel
-  // Check all servers and see if they have a designated file.
+  // Check all servers and see if they have a designated file. If they don't, make one.
   client.guilds.array().forEach((item, i) => {
     var file = `${datapath}/server/${item.id}.json`;
     if (!fs.existsSync(file)) {
       var defaultJson = {
         prefix: config.prefix,
-        commands: {}
+        commands: {
+          descriptions: {}
+        }
       }
       util.writeJSONToFile(defaultJson, file);
     }
@@ -54,7 +58,6 @@ client.on('message', message => {
   if (message.guild == null) return;
 
   var prefix = util.getServerPrefix(message.guild.id);
-  console.log(prefix);
   console.log(`${util.timestamp()} ${message.author.tag} (${message.channel.name}): ${message.content}`);
   // Check if message contains prefix
   if (message.content.startsWith(prefix)) {
@@ -64,9 +67,8 @@ client.on('message', message => {
       // Pass to command.js for easier interpreting later
       command.set(message);
       // Run command
-      commands[cmdName].execute(message, command);
+      commands[cmdName].execute(message, command); // messa
     }
-    console.log("hi");
     // Check if command is a server-specific command
     var json = util.JSONFromFile(util.getServerJSON(message.guild.id));
     if (json.commands[cmdName] != undefined) {

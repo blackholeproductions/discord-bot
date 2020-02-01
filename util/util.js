@@ -51,8 +51,8 @@ function cmdCount() {
 ** Description: gets json data from file as object
 ** Comment:
 */
-function JSONFromFile(pathToFile) {
-  var data = fs.readFileSync(pathToFile);
+function JSONFromFile(path) {
+  var data = fs.readFileSync(path);
   return JSON.parse(data);
 }
 
@@ -61,13 +61,13 @@ function JSONFromFile(pathToFile) {
 ** Description: write json to file
 ** Comment:
 */
-function writeJSONToFile(data, pathToFile) {
-  fs.writeFileSync(pathToFile, JSON.stringify(data, null, 2)); // "null, 2" makes the file humanly readable ig
+function writeJSONToFile(data, path) {
+  fs.writeFileSync(path, JSON.stringify(data, null, 2)); // "null, 2" makes the file humanly readable ig
 }
 
 /*
-** getServerPrefix()
-** Description: Get a server's prefix
+** getServerJSON()
+** Description: Get path to server's json file
 ** Comment:
 */
 function getServerJSON(id) {
@@ -85,8 +85,8 @@ function getServerPrefix(id) {
 }
 
 /*
-** getServerPrefix()
-** Description: Get a server's prefix
+** setServerPrefix()
+** Description: Set a server's prefix
 ** Comment:
 */
 function setServerPrefix(id, prefix) {
@@ -109,8 +109,8 @@ function addCommand(id, name, text) {
 }
 
 /*
-** getServerPrefix()
-** Description: Get a server's prefix
+** deleteCommand()
+** Description: Delete custom command from servers
 ** Comment:
 */
 function deleteCommand(id, name) {
@@ -119,7 +119,20 @@ function deleteCommand(id, name) {
   delete json.commands[name];
   writeJSONToFile(json, path);
 }
+/*
+** setCommandDescription()
+** Description: Set a custom command's description
+** Comment:
+*/
+function setCommandDescription(id, name, description) {
+  var path = getServerJSON(id);
+  var json = JSONFromFile(path);
+  json.commands.descriptions[`${name}`] = description;
+  writeJSONToFile(json, path);
+}
 
+
+exports.setCommandDescription = setCommandDescription;
 exports.getServerJSON = getServerJSON;
 exports.addCommand = addCommand;
 exports.deleteCommand = deleteCommand;
