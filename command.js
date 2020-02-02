@@ -6,7 +6,7 @@ const set = (message) => {
   // Check if command has arguments, set args if so
   if (message.content.split(" ").length-1 > 0) {
     args = message.content.split(name+" ")[1].split(" ");
-  }
+  } else args = []; // if not, set it blank
   console.log(`${util.timestamp()} ${message.author.username} ran the command ${name}`);
 };
 const get = () => {
