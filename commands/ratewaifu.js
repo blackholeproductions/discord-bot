@@ -4,24 +4,22 @@ const util = require(__basedir+"/util/util.js"),
       args = "<waifu>";
 // from old bot, maybe rewrite later (now partially rewritten)
 const execute = (message, command) => {
-  if (command.getArgs().length == 1) {
-    var denominator = 10; // What to rate out of (currently 8/10)
-    var waifu = command.getArgs()[0];
-
-    //positively FUCK it into a number. maybe put it in a function later for positively fucking other numbers with relative ease
-    var ship = util.hashCode(md5(util.hashCode(util.hashCode(waifu.toLowerCase(), 5812).toString()))).toString();
-    var shipd = util.hashCode(ship).toString();
-
-    var shipPercentA = ship.substring(ship.length - 3, ship.length - 1); // Get the rating from the giant number
-    // no idea what this does but i'm pretty sure it makes it 6/9 sometimes or something. dunno.
-    if (parseInt(shipd.substring(0, 1)) == 5 && parseInt(shipPercentA) == 6) {
-      denominator = 9;
-    }
-    if (shipPercentA !== "10") shipPercentA = ship.substring(ship.length - 2, ship.length - 1);
-    console.log(waifu + " got a " + shipPercentA + "/" + denominator);
-    if (shipPercentA !== "8") message.channel.send("i would give `" + command.getArgs()[0] + "` a **" + shipPercentA + "/" + denominator + "**");
-    if (shipPercentA == "8") message.channel.send("i would give `" + command.getArgs()[0] + "` an **" + shipPercentA + "/" + denominator + "**");
+  var waifu = command.getArgs()[0];
+  if (command.getArgs().length != 1) {
+    message.channel.send("You need to specifiy the waifu to rate.");
+    return;
   }
+  var random = parseInt(util.seededRand(waifu).toString().substring(4, 6));
+  var zeroOrTen = function(value) {
+    for (var i = 0, zero = false; i < 5; i++) { // For values 0-4 (5 values/10 total possible so equal chance of 0 and 10), set value to 0.
+      if (value.toString().startsWith(i.toString())) zero = true;
+    }
+    if (zero) return 0; else return 10; // If not, set value to 10.
+  }
+  if (random.toString().endsWith("0")) random = zeroOrTen(random);
+  if (random.toString().length > 1 && random != 10) random = random.toString().substring(1, 2); // If the value is not 10, only take the ending part so we have a single digit
+
+  message.channel.send(`I would give \`${waifu}\` a${random === 8 ? "n" : ""} **${random}/10**`); // Give a grammatically correct (eight is starts with vowel) answer
 }
 
 exports.args = args;

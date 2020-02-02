@@ -1,19 +1,27 @@
 const md5 = require('md5');
       fs  = require('fs');
 /*
-** hashCode()
+** seededRand()
 ** Description: Turns a string into a number (same output for same string)
-** Comment: no idea how the fuck this works but it does so i dont care
+** Comment: rewritten, brand new
 */
-var seed=96343;
-const hashCode = (s, t) => {
-  s=s+s;
-  if(t == 0 || isNaN(t)) var t=seed;
-for(var i = 0, h = 0; i < s.length; i++) {
-    h = h + Math.abs(s.charCodeAt(i)*s.charCodeAt(i)*33+s.length*t+s.charCodeAt(i)*27*(t*3)) | 0;
+
+const seededRand = (seed, localseed) => {
+  var random = 0;
+  if (localseed == 0 || isNaN(localseed)) localseed = 78125.905218;
+
+  var randomize = function(value) {
+    var newvalue = 0;
+    value = md5(value);
+    for (var i = 0; i < value.length; i++) {
+      newvalue += Math.abs((value.charCodeAt(i)-value.charCodeAt(value.length-1-i))*localseed);
+    }
+    return Math.round(newvalue);
   }
-  var k = md5(h+s+t);
-return h;
+
+  random = randomize(md5(seed));
+
+  return random;
 }
 
 /*
@@ -142,4 +150,4 @@ exports.JSONFromFile = JSONFromFile;
 exports.writeJSONToFile = writeJSONToFile;
 exports.cmdCount = cmdCount;
 exports.timestamp = timestamp;
-exports.hashCode = hashCode;
+exports.seededRand = seededRand;
