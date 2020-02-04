@@ -6,7 +6,7 @@ const util = require(__basedir+"/util/util.js"),
 const execute = (message, command) => {
   var waifu = command.getArgs()[0];
   if (command.getArgs().length != 1) {
-    message.channel.send("You need to specifiy the waifu to rate.");
+    message.channel.send("You need to specify the waifu to rate.");
     return;
   }
   var random = parseInt(util.seededRand(waifu).toString().substring(4, 6)); // Tested a few different parts of the seededRand outputs, this seems to be the most random (with a slight lean toward 0 of about 4%)
