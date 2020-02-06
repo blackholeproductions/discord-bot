@@ -1,8 +1,9 @@
 var name = "", // Current command name
     args = []; // All arguments of current command
 
-const set = (message) => {
-  name = message.content.split(util.getServerPrefix(message.guild.id))[1].split(" ")[0];
+const set = (message, prefix) => {
+  if (prefix !== undefined) name = message.content.split(prefix)[1].split(" ")[0];
+  else name = message.content.split(util.getServerPrefix(message.guild.id))[1].split(" ")[0];
   // Check if command has arguments, set args if so
   if (message.content.split(" ").length-1 > 0) {
     args = message.content.split(name+" ")[1].split(" ");
@@ -14,10 +15,10 @@ const get = () => {
 };
 const getName = () => {
   return name;
-}
+};
 const getArgs = () => {
   return args;
-}
+};
 
 exports.set = set;
 exports.get = get;

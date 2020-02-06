@@ -1,5 +1,8 @@
-const md5 = require('md5');
-      fs  = require('fs');
+const md5     = require('md5'),
+      fs      = require('fs'),
+      modules = require('./modules.js'),
+      json    = require('./json.js');
+
 /*
 ** seededRand()
 ** Description: Turns a string into a number (same output for same string)
@@ -55,41 +58,13 @@ function cmdCount() {
 }
 
 /*
-** JSONFromFile()
-** Description: gets json data from file as object
-** Comment:
-*/
-function JSONFromFile(path) {
-  var data = fs.readFileSync(path);
-  return JSON.parse(data);
-}
-
-/*
-** writeJSONToFile()
-** Description: write json to file
-** Comment:
-*/
-function writeJSONToFile(data, path) {
-  fs.writeFileSync(path, JSON.stringify(data, null, 2)); // "null, 2" makes the file humanly readable ig
-}
-
-/*
-** getServerJSON()
-** Description: Get path to server's json file
-** Comment:
-*/
-function getServerJSON(id) {
-  return `${datapath}/server/${id}.json`;
-}
-
-/*
 ** getServerPrefix()
 ** Description: Get a server's prefix
 ** Comment:
 */
 function getServerPrefix(id) {
-  var json = JSONFromFile(getServerJSON(id));
-  return json.prefix;
+  var data = json.JSONFromFile(json.getServerJSON(id));
+  return data.prefix;
 }
 
 /*
@@ -98,10 +73,10 @@ function getServerPrefix(id) {
 ** Comment:
 */
 function setServerPrefix(id, prefix) {
-  var path = getServerJSON(id);
-  var json = JSONFromFile(path);
-  json.prefix = prefix;
-  writeJSONToFile(json, path);
+  var path = json.getServerJSON(id);
+  var data = json.JSONFromFile(path);
+  data.prefix = prefix;
+  json.writeJSONToFile(data, path);
 }
 
 /*
@@ -110,10 +85,10 @@ function setServerPrefix(id, prefix) {
 ** Comment:
 */
 function addCommand(id, name, text) {
-  var path = getServerJSON(id);
-  var json = JSONFromFile(path);
-  json.commands[`${name}`] = text;
-  writeJSONToFile(json, path);
+  var path = json.getServerJSON(id);
+  var data = json.JSONFromFile(path);
+  data.commands[`${name}`] = text;
+  json.writeJSONToFile(data, path);
 }
 
 /*
@@ -122,10 +97,10 @@ function addCommand(id, name, text) {
 ** Comment:
 */
 function deleteCommand(id, name) {
-  var path = getServerJSON(id);
-  var json = JSONFromFile(path);
-  delete json.commands[name];
-  writeJSONToFile(json, path);
+  var path = json.getServerJSON(id);
+  var data = json.JSONFromFile(path);
+  delete data.commands[name];
+  json.writeJSONToFile(data, path);
 }
 /*
 ** setCommandDescription()
@@ -133,21 +108,19 @@ function deleteCommand(id, name) {
 ** Comment:
 */
 function setCommandDescription(id, name, description) {
-  var path = getServerJSON(id);
-  var json = JSONFromFile(path);
-  json.commands.descriptions[`${name}`] = description;
-  writeJSONToFile(json, path);
+  var path = json.getServerJSON(id);
+  var data = json.JSONFromFile(path);
+  data.commands.descriptions[`${name}`] = description;
+  json.writeJSONToFile(data, path);
 }
 
-
+exports.json = json;
+exports.modules = modules;
 exports.setCommandDescription = setCommandDescription;
-exports.getServerJSON = getServerJSON;
 exports.addCommand = addCommand;
 exports.deleteCommand = deleteCommand;
 exports.getServerPrefix = getServerPrefix;
 exports.setServerPrefix = setServerPrefix;
-exports.JSONFromFile = JSONFromFile;
-exports.writeJSONToFile = writeJSONToFile;
 exports.cmdCount = cmdCount;
 exports.timestamp = timestamp;
 exports.seededRand = seededRand;

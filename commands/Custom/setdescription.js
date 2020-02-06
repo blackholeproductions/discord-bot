@@ -7,7 +7,7 @@ const execute = (message, command) => {
   }
   if (message.member.hasPermission("MANAGE_GUILD")) {
     var cmdName = command.getArgs()[0];
-    var json = util.JSONFromFile(util.getServerJSON(message.guild.id));
+    var json = util.json.JSONFromFile(util.json.getServerJSON(message.guild.id));
     var description = command.getArgs().slice(1).join(" ");
     if (description.length > 150) { // Ensure the description isn't too long
       message.channel.send("The description mustn't exceed 150 characters.");

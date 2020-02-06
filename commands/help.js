@@ -1,14 +1,17 @@
 const desc = "Get a list of commands";
-      args = "<page>";
+      args = "<page> <server/bot/all> ";
 
 const execute = (message, command) => {
-  var page       = parseInt(command.getArgs()[0])-1,                                 // page number
-      pageSize   = 10,                                                               // size of each page
-      cmdlist    = { servercmds: {} },                                               // list of commands and their descriptions
-      servercmds = util.JSONFromFile(util.getServerJSON(message.guild.id)).commands, // list of server commands
-      prefix     = util.getServerPrefix(message.guild.id);                           // server prefix
-      draft      = "";                                                               // message to send
-      length     = 0;                                                                // length of cmdlist
+  var helpType   = command.getArgs()[1],                                                       // second argument
+      server     = helpType == "server" || helpType == "all" || helpType == undefined,         // whether we want server commands or not
+      bot        = helpType == "bot" || helpType == "all" || helpType == undefined,            // whether we want bot commands or not
+      page       = parseInt(command.getArgs()[0])-1,                                           // page number
+      pageSize   = 10,                                                                         // size of each page
+      cmdlist    = { servercmds: {} },                                                         // list of commands and their descriptions
+      servercmds = util.json.JSONFromFile(util.json.getServerJSON(message.guild.id)).commands, // list of server commands
+      prefix     = util.getServerPrefix(message.guild.id);                                     // server prefix
+      draft      = "";                                                                         // message to send
+      length     = 0;                                                                          // length of cmdlist
 
   if (page == undefined) page = 0;
   if (isNaN(page)) page = 0;
@@ -21,23 +24,40 @@ const execute = (message, command) => {
     }
     return obj;
   }
-  // Construct a list of all of the commands with their descriptions
-  for (var command in commands) {
-    var category = commands[command].path.split(`${__basedir}/commands/`)[1];
-    if (category.includes("/")) {
-      category = category.substring(0, category.lastIndexOf("/"));
-    } else {
-      category = '';
+  if (bot) {
+    // Construct a list of all of the commands with their descriptions
+    for (var cmd in commands) {
+      var category = commands[cmd].path.split(`${__basedir}/commands/`)[1];
+      if (category.includes("/")) {
+        category = category.substring(0, category.lastIndexOf("/"));
+      } else {
+        category = '';
+      }
+      cmdlist[cmd] = genCmdObj(commands[cmd].desc, category);
+      length++;
     }
-    cmdlist[command] = genCmdObj(commands[command].desc, category);
-    length++;
+    // Do the same for module commands.
+    for (var cmd in modulecmds) {
+      var category = modulecmds[cmd].path.split(`${__basedir}/commands/`)[1];
+      if (category.includes("/")) {
+        category = category.substring(0, category.lastIndexOf("/"));
+      } else {
+        category = '';
+      }
+      if (util.modules.isEnabled(modulecmds[cmd].module, message.guild.id)) {
+        cmdlist[cmd] = genCmdObj(modulecmds[cmd].desc, category);
+        length++;
+      }
+    }
   }
-  for (var command in servercmds) {
-    cmdlist.servercmds[command] = servercmds.descriptions[command];
-    if (cmdlist.servercmds[command] == undefined) cmdlist.servercmds[command] = "No description provided";
-    length++;
+  if (server) {
+    // Do the same for server-specific commands
+    for (var command in servercmds) {
+      cmdlist.servercmds[command] = servercmds.descriptions[command];
+      if (cmdlist.servercmds[command] == undefined) cmdlist.servercmds[command] = "No description provided";
+      length++;
+    }
   }
-
 
 
   // Skip until the first index of the current page and then print out the next pageSize elements. If it runs out of commands to list in the
@@ -64,7 +84,8 @@ const execute = (message, command) => {
   for (var category in categories) {
     categoryDraft += `  --- **${category} commands** ---\n`;
     for (var command in categories[category]) {
-      categoryDraft += `  **${prefix}${command} ${commands[command].args}** - ${categories[category][command].description}\n`;
+      var cmd = commands[command] || modulecmds[command];
+      categoryDraft += `  **${prefix}${command} ${cmd.args}** - ${categories[category][command].description}\n`;
     }
   }
   if (categoryDraft !== "" && draft !== "") {
@@ -72,7 +93,7 @@ const execute = (message, command) => {
     draft = `--- **Bot commands** ---\n` + draft; // prefix with title
   }
 
-  draft += `--- **Server commands** ---\n`;
+  if (server && !(iteration > (page+1)*pageSize-1)) draft += `--- **Server commands** ---\n`;
 
   for (var command in cmdlist.servercmds) {
     if (iteration > (page+1)*pageSize-1) break;

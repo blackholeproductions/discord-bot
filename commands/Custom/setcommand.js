@@ -10,15 +10,14 @@ const execute = (message, command) => {
     if (cmdName.length > 50) { // Ensure the command name isn't too long
       message.channel.send("The command name mustn't exceed 50 characters.");
       return;
-    } else if (cmdName == "servercmds") { // Used for listing server commands in help command
-      message.channel.send("That command name is reserved.");
-      return;
     }
     if (cmdName in commands) { // Check if command is a bot command
-      message.channel.send("That command name conflicts with one that already exists.");
+      message.channel.send("That command name conflicts with a bot command that already exists.");
+    } else if (cmdName in modulecmds) { // Also check if command is a module command
+      message.channel.send("That command name conflicts with a module command that already exists.");
     } else {
       util.addCommand(message.guild.id, cmdName, command.getArgs().slice(1).join(" "));
-      message.channel.send(`Created command **${cmdName}**. Do ${util.getServerPrefix(message.guild.id)}setdescription <command> <description> to change the description of the command so that it shows properly in the help menu.`);
+      message.channel.send(`Created command **${cmdName}**. Do ${util.json.getServerPrefix(message.guild.id)}setdescription <command> <description> to change the description of the command so that it shows properly in the help menu.`);
     }
   }
 }
