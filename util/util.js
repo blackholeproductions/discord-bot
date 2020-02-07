@@ -1,7 +1,9 @@
-const md5     = require('md5'),
-      fs      = require('fs'),
-      modules = require('./modules.js'),
-      json    = require('./json.js');
+const md5      = require('md5'),
+      fs       = require('fs'),
+      modules  = require('./modules.js'),
+      json     = require('./json.js'),
+      xp       = require('./xp.js'),
+      readline = require('readline');
 
 /*
 ** seededRand()
@@ -54,13 +56,15 @@ function cmdCount() {
   for (var command in commands) {
     count++;
   }
+  for (var command in modulecmds) {
+    count++;
+  }
   return count;
 }
 
 /*
 ** getServerPrefix()
 ** Description: Get a server's prefix
-** Comment:
 */
 function getServerPrefix(id) {
   var data = json.JSONFromFile(json.getServerJSON(id));
@@ -70,7 +74,6 @@ function getServerPrefix(id) {
 /*
 ** setServerPrefix()
 ** Description: Set a server's prefix
-** Comment:
 */
 function setServerPrefix(id, prefix) {
   var path = json.getServerJSON(id);
@@ -82,7 +85,6 @@ function setServerPrefix(id, prefix) {
 /*
 ** addCommand()
 ** Description: Add custom command to server
-** Comment:
 */
 function addCommand(id, name, text) {
   var path = json.getServerJSON(id);
@@ -94,7 +96,6 @@ function addCommand(id, name, text) {
 /*
 ** deleteCommand()
 ** Description: Delete custom command from servers
-** Comment:
 */
 function deleteCommand(id, name) {
   var path = json.getServerJSON(id);
@@ -105,7 +106,6 @@ function deleteCommand(id, name) {
 /*
 ** setCommandDescription()
 ** Description: Set a custom command's description
-** Comment:
 */
 function setCommandDescription(id, name, description) {
   var path = json.getServerJSON(id);
@@ -113,7 +113,34 @@ function setCommandDescription(id, name, description) {
   data.commands.descriptions[`${name}`] = description;
   json.writeJSONToFile(data, path);
 }
+/*
+** askQuestion()
+** Description: query console and retur nit
+*/
+function askQuestion(query) {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
 
+    return new Promise(resolve => rl.question(query, ans => {
+        rl.close();
+        resolve(ans);
+    }))
+}
+/*
+** generateRandomNumber(min, max)
+** Description: guess. guess what this function does.
+*/
+function generateRandomNumber(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+exports.generateRandomNumber = generateRandomNumber;
+exports.askQuestion = askQuestion;
+exports.xp = xp;
 exports.json = json;
 exports.modules = modules;
 exports.setCommandDescription = setCommandDescription;

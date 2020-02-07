@@ -98,7 +98,7 @@ const execute = (message, command) => {
   for (var command in cmdlist.servercmds) {
     if (iteration > (page+1)*pageSize-1) break;
     iteration++;
-    if (iteration < page*pageSize+1) continue;  // a few of the same checks as above
+    if (iteration < page*pageSize+1) continue; // a few of the same checks as above
 
     draft += `**${prefix}${command}** - ${cmdlist.servercmds[command]}\n`;
   }

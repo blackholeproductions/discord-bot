@@ -7,7 +7,7 @@ const execute = (message, command) => {
   }
   if (message.member.hasPermission("MANAGE_GUILD")) {
     var prefix = command.getArgs()[0];
-    util.setServerPrefix(message.guild.id, prefix);
+    util.  setServerPrefix(message.guild.id, prefix);
     message.channel.send(`Set prefix to ${prefix}`);
   } else {
     message.channel.send('You do not have sufficient permissions. (Need "Manage Server" Permission)');
