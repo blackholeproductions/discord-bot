@@ -1,4 +1,5 @@
 function execute(startmsg) {
+  const Discord = require('discord.js');
   global.__basedir = __dirname; // global variable that stores base directory
   global.datapath = `${__basedir}/data`;
   global.commands = {};
@@ -6,10 +7,8 @@ function execute(startmsg) {
   global.modules = [];
   global.config = require(`${__basedir}/config.js`);
   global.util = require(`${__basedir}/util/util.js`);
-
-  const Discord = require('discord.js'),
-        client  = new Discord.Client(),
-        path    = require('path'),
+  global.client = new Discord.Client();
+  const path    = require('path'),
         fs      = require('fs'),
         md5     = require('md5');
 
@@ -101,9 +100,6 @@ function execute(startmsg) {
     if (message.guild == null) return;
     if (util.xp.isEnabled(message.guild.id)) {
       util.xp.addXP(message.author.id, message.guild.id);
-      console.log("Abc2");
-    } else {
-      console.log("Abc");
     }
     var prefix = util.getServerPrefix(message.guild.id);
     console.log(`${util.timestamp()} ${message.author.tag} (${message.channel.name}): ${message.content}`);

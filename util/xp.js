@@ -82,7 +82,40 @@ function startXPCooldowns() {
     }
   }, 1000);
 }
+/*
+** getLeaderboard(id, page)
+** Description: start the xp timers
+** Comment: called in bot function
+*/
+function getLeaderboard(id, page) {
+  page = page || 1;
+  var pageSize = 10,
+      output   = "",
+      path     = util.json.getServerJSON(id),
+      data     = util.json.JSONFromFile(path),
+      output   = "";
+  if (data.xp == undefined) return "There is no xp data for this server.";
+  // Sort by putting in array and using the sort() function
+  var array = [];
+  for (var xp in data.xp) {
+    array.push({ id: xp, xp: data.xp[xp] });
+  }
+  array.sort(function(a, b) {
+    return b.xp - a.xp;
+  });
 
+  var i = 0;
+  for (var object in array) {
+    i++;
+    if (i < (page-1)*pageSize) continue; // Page system
+    if (i > page*pageSize) break;
+    output += `${i+1}. **${client.guilds.get(id).members.get(array[object].id).user.username}** (${getXP(array[object].id, id)} xp, Level ${getLevel(array[object].id, id)})\n`;
+  }
+  output += `Page ${Math.ceil(i/pageSize)}`;
+  return output;
+}
+
+exports.getLeaderboard = getLeaderboard;
 exports.startXPCooldowns = startXPCooldowns;
 exports.hasXPCooldown = hasXPCooldown;
 exports.addXPCooldown = addXPCooldown;
