@@ -9,5 +9,7 @@ const execute = (message, command) => {
   util.modules.enable(selectedmodule, message.guild.id);
   message.channel.send(`Enabled **${selectedmodule}** module! View module commands in ${util.getServerPrefix(message.guild.id)}help`);
 }
+
+exports.args = args;
 exports.desc = desc;
 exports.execute = execute;

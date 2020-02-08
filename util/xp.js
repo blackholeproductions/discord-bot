@@ -20,7 +20,8 @@ function addXP(user, guild, amount) {
   if (data.xp[user] == undefined) data.xp[user] = 0; //set xp to 0 if it doesn't exist
   data.xp[user] = data.xp[user] + amount; // add xp
   util.json.writeJSONToFile(data, path);
-  addXPCooldown(user);
+  addXPCooldown(user); // Add XP cooldown so that the user can't spam and earn XP
+  if (util.modules.isEnabled("xpleaderboard", guild)) updateLeaderboard(guild); // Update the leaderbord if the module is enabled
 }
 function getXP(user, guild) {
   var path = util.json.getServerJSON(guild);
@@ -106,15 +107,46 @@ function getLeaderboard(id, page) {
 
   var i = 0;
   for (var object in array) {
+    if (isNaN(parseInt(array[object].id))) continue; // Handle non-users in xp object
+    if (array[object].id == "672280373065154569") continue; // Skip bot user from leaderboard
     i++;
     if (i < (page-1)*pageSize) continue; // Page system
     if (i > page*pageSize) break;
-    output += `${i+1}. **${client.guilds.get(id).members.get(array[object].id).user.username}** (${getXP(array[object].id, id)} xp, Level ${getLevel(array[object].id, id)})\n`;
+    var member = client.guilds.get(id).members.get(array[object].id);
+    if (member == undefined) member = { user: { username: "Unknown", id: "Unknown"} }; // Replace username with "Unknown" since we don't know what their real username is
+    output += `${i}. **<@${member.user.id}>** (${getXP(array[object].id, id)} xp, Level ${getLevel(array[object].id, id)})\n`;
   }
   output += `Page ${Math.ceil(i/pageSize)}`;
   return output;
 }
+/*
+** setLeaderboardMessage(guildid, channelid, messageid)
+** Description: start the xp timers
+*/
+function setLeaderboardMessage(guildID, channelID, messageID) {
+  var path = util.json.getServerJSON(guildID);
+  var data = util.json.JSONFromFile(path);
+  data.xp.leaderboardMessageID = messageID;
+  data.xp.leaderboardChannelID = channelID;
+  util.json.writeJSONToFile(data, path);
+}
+/*
+** updateLeaderboard(guildid)
+** Description: start the xp timers
+*/
+function updateLeaderboard(guildID) {
+  var path = util.json.getServerJSON(guildID),
+      data = util.json.JSONFromFile(path),
+      channelID = data.xp.leaderboardChannelID,
+      messageID = data.xp.leaderboardMessageID;
+  if (channelID == undefined || messageID == undefined) return;
+  client.guilds.get(guildID).channels.get(channelID).fetchMessage(messageID)
+    .then(msg => msg.edit(getLeaderboard(guildID)))
+    .catch(`Error updating leaderboard in ${guildID}`);
+}
 
+exports.setLeaderboardMessage = setLeaderboardMessage;
+exports.updateLeaderboard = updateLeaderboard;
 exports.getLeaderboard = getLeaderboard;
 exports.startXPCooldowns = startXPCooldowns;
 exports.hasXPCooldown = hasXPCooldown;

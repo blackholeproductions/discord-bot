@@ -1,4 +1,4 @@
-const desc = "Enable a module in your discord server",
+const desc = "Disable a module in your discord server",
       args = "<module name>";
 const execute = (message, command) => {
   var selectedmodule = command.getArgs()[0];
@@ -9,5 +9,7 @@ const execute = (message, command) => {
   util.modules.disable(selectedmodule, message.guild.id);
   message.channel.send(`Disabled **${selectedmodule}** module`);
 }
+
+exports.args = args;
 exports.desc = desc;
 exports.execute = execute;

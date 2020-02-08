@@ -10,5 +10,7 @@ const execute = (message, command) => {
     message.channel.send(`You have **${util.xp.getXP(message.author.id, message.guild.id)}** xp (Level ${util.xp.getLevel(message.author.id, message.guild.id)})`);
   }
 }
+
+exports.args = args;
 exports.desc = desc;
 exports.execute = execute;

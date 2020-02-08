@@ -42,5 +42,7 @@ const execute = (message, command) => {
 
   message.channel.send(output);
 }
+
+exports.args = args;
 exports.desc = desc;
 exports.execute = execute;
