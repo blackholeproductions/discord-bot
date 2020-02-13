@@ -22,6 +22,9 @@ function addXP(user, guild, amount) {
   util.json.writeJSONToFile(data, path);
   addXPCooldown(user); // Add XP cooldown so that the user can't spam and earn XP
   if (util.modules.isEnabled("xpleaderboard", guild)) updateLeaderboard(guild); // Update the leaderbord if the module is enabled
+  if (util.modules.isEnabled("xproles", guild)) {
+    
+  }
 }
 function getXP(user, guild) {
   var path = util.json.getServerJSON(guild);
@@ -121,7 +124,7 @@ function getLeaderboard(id, page) {
 }
 /*
 ** setLeaderboardMessage(guildid, channelid, messageid)
-** Description: start the xp timers
+** Description: set the leaderboard message id for the guild
 */
 function setLeaderboardMessage(guildID, channelID, messageID) {
   var path = util.json.getServerJSON(guildID);
@@ -132,7 +135,7 @@ function setLeaderboardMessage(guildID, channelID, messageID) {
 }
 /*
 ** updateLeaderboard(guildid)
-** Description: start the xp timers
+** Description: update the leaderboard message in the server
 */
 function updateLeaderboard(guildID) {
   var path = util.json.getServerJSON(guildID),
@@ -143,6 +146,24 @@ function updateLeaderboard(guildID) {
   client.guilds.get(guildID).channels.get(channelID).fetchMessage(messageID)
     .then(msg => msg.edit(getLeaderboard(guildID)))
     .catch(`Error updating leaderboard in ${guildID}`);
+}
+/*
+** addRole()
+** Description: start the xp timers
+*/
+function updateRoles(userID, guildID) {
+  var path = util.json.getServerJSON(guildID);
+  var data = util.json.JSONFromFile(path);
+  for (var threshold in 
+}
+/*
+** updateRoles(userid, guildid)
+** Description: start the xp timers
+*/
+function updateRoles(userID, guildID) {
+  var path = util.json.getServerJSON(guildID);
+  var data = util.json.JSONFromFile(path);
+  for (var threshold in 
 }
 
 exports.setLeaderboardMessage = setLeaderboardMessage;
