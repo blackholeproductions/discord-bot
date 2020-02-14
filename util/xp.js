@@ -30,10 +30,6 @@ function addXP(user, guild, amount) {
   addXPCooldown(user); // Add XP cooldown so that the user can't spam and earn XP
   if (util.modules.isEnabled("xpleaderboard", guild)) updateLeaderboard(guild); // Update the leaderboard if the module is enabled
   if (util.modules.isEnabled("xp-roles", guild)) updateRoles(user, guild); // Update the user's roles if the module is enabled
-  if (util.modules.isEnabled("xpleaderboard", guild)) updateLeaderboard(guild); // Update the leaderbord if the module is enabled
-  if (util.modules.isEnabled("xproles", guild)) {
-
-  }
 }
 function getXP(user, guild) {
   var path = util.json.getServerJSON(guild);
@@ -116,6 +112,11 @@ function getLeaderboard(id, page) {
   array.sort(function(a, b) {
     return b.xp - a.xp;
   });
+  // get day for showing today's xp gained in leaderboardChannelID
+  var date = new Date(Date.now());
+  var day = Math.floor((date.getTime()-date.getTimezoneOffset()*60000)/86400000); // Get number of days since epoch (timezone stuff cus it was off by that many hours)
+  if (data.xp.history == undefined) data.xp.history = {};
+  if (data.xp.history[day] == undefined) data.xp.history[day] = {};
 
   var i = 0;
   for (var object in array) {
@@ -125,8 +126,9 @@ function getLeaderboard(id, page) {
     if (i < (page-1)*pageSize+(page-1)) continue; // Page system
     if (i > page*pageSize) break;
     var member = client.guilds.get(id).members.get(array[object].id);
+    var xptoday = data.xp.history[day][member.user.id];
     if (member == undefined) member = { user: { username: "Unknown", id: "Unknown"} }; // Replace username with "Unknown" since we don't know what their real username is
-    output += `${i}. **<@${member.user.id}>** (${getXP(array[object].id, id)} xp, Level ${getLevel(array[object].id, id)}${util.modules.isEnabled("xp-roles", id) ? ` <@&${getHighestRole(id, getLevel(array[object].id, id))}>` : ""})\n`;
+    output += `${i}. **<@${member.user.id}>** - ${getXP(array[object].id, id)} xp${xptoday !== undefined ? " (" : ""}${xptoday >= 0 ? "+" : ""}${xptoday < 0 ? "-" : ""}${xptoday !== undefined ? `${xptoday} gained today` : ""}${xptoday !== undefined ? ")" : ""}, Level ${getLevel(array[object].id, id)}${util.modules.isEnabled("xp-roles", id) ? ` <@&${getHighestRole(id, getLevel(array[object].id, id))}>` : ""}\n`;
   }
   output += `Page ${Math.ceil((i-1)/pageSize)}`;
   return output;
@@ -194,7 +196,7 @@ function updateRoles(userID, guildID) {
       member.addRole(role, "Reached level threshold"); // Add the role to the user
     } else {
       if (member.roles.get(role) !== undefined) { // If the user has the role and they aren't high enough level to have it, remove it
-        member.addRole(role, "Under level threshold");
+        member.removeRole(role, "Under level threshold");
       }
     }
   }
