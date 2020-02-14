@@ -30,6 +30,10 @@ function addXP(user, guild, amount) {
   addXPCooldown(user); // Add XP cooldown so that the user can't spam and earn XP
   if (util.modules.isEnabled("xpleaderboard", guild)) updateLeaderboard(guild); // Update the leaderboard if the module is enabled
   if (util.modules.isEnabled("xp-roles", guild)) updateRoles(user, guild); // Update the user's roles if the module is enabled
+  if (util.modules.isEnabled("xpleaderboard", guild)) updateLeaderboard(guild); // Update the leaderbord if the module is enabled
+  if (util.modules.isEnabled("xproles", guild)) {
+
+  }
 }
 function getXP(user, guild) {
   var path = util.json.getServerJSON(guild);
@@ -152,7 +156,6 @@ function updateLeaderboard(guildID) {
     .then(msg => msg.edit(getLeaderboard(guildID)))
     .catch(`Error updating leaderboard in ${guildID}`);
 }
-
 /*
 ** setRole(guildID, roleID, levelThreshold)
 ** Description: set a role to be obtained at a certain level
