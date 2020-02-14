@@ -19,6 +19,8 @@ const execute = (message, command) => {
       util.addCommand(message.guild.id, cmdName, command.getArgs().slice(1).join(" "));
       message.channel.send(`Created command **${cmdName}**. Do ${util.json.getServerPrefix(message.guild.id)}setdescription <command> <description> to change the description of the command so that it shows properly in the help menu.`);
     }
+  } else {
+    message.channel.send("You don't have permission.");
   }
 }
 

@@ -23,7 +23,7 @@ const enable = (mod, id) => {
 
 const isEnabled = (mod, id) => {
   var data = util.json.JSONFromFile(util.json.getServerJSON(id));
-  if (data.modules[mod] == undefined || data.modules == undefined) return false;
+  if (data.modules == undefined || data.modules[mod] == undefined) return false;
   if (data.modules[mod]) return true; else return false;
 }
 /*

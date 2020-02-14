@@ -18,6 +18,8 @@ const execute = (message, command) => {
     } else {
       message.channel.send(`Command *${cmdName}* does not exist!`);
     }
+  } else {
+    message.channel.send("You don't have permission.");
   }
 }
 

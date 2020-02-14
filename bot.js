@@ -4,7 +4,7 @@ function execute(startmsg) {
   global.datapath = `${__basedir}/data`;
   global.commands = {};
   global.modulecmds = {};
-  global.modules = [];
+  global.modules = {};
   global.config = require(`${__basedir}/config.js`);
   global.util = require(`${__basedir}/util/util.js`);
   global.client = new Discord.Client();
@@ -45,17 +45,20 @@ function execute(startmsg) {
     if (fs.statSync(file).isDirectory()) { // If the file is a directory
       if (fs.existsSync(`${file}/module.json`)) { // Check for module.json
         var selectedmodule = file.split("/")[file.split("/").length-1];
+        console.log(selectedmodule);
         modules[selectedmodule] = {};
         modules[selectedmodule].description = util.json.JSONFromFile(`${file}/module.json`).description;
+        console.log(modules[selectedmodule]);
       }
     }
   });
-  console.log(`Loaded modules: ${modules}`);
+  console.log(modules);
+
 
   // Load global commands, then load them into the commands object.
   readFiles(filePath).filter(file => file.endsWith('.js')).forEach(function(file) {
     var name = file.split("/")[file.split("/").length-1].split(".")[0]; // Remove directory to get just the command name
-    if (fs.existsSync(`${file.split(name)[0]}/module.json`)) { // Check for module.json
+    if (fs.existsSync(`${file.split(`${name}.js`)[0]}/module.json`)) { // Check for module.json
       modulecmds[name] = require(file);
       modulecmds[name].path = file; // same as below
       modulecmds[name].module = file.split(`${__basedir}/commands/`)[1].split("/")[0]; // set module name to directory name
@@ -66,6 +69,9 @@ function execute(startmsg) {
       if (commands[name].args == undefined) commands[name].args = ""; // if the command doesn't specify arguments, set it to nothing so js doesn't scream undefined at me
     }
   });
+
+  console.log(modulecmds);
+
   console.log(commands); // View registered commands and their function(s) in console
 
   // On bot start, add the current time of starting & command count to a json file.
@@ -87,7 +93,7 @@ function execute(startmsg) {
           commands: {
             descriptions: {}
           },
-          modulecmds: {}
+          modules: {}
         }
         util.writeJSONToFile(defaultJson, file);
       }

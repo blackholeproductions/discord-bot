@@ -1,4 +1,4 @@
-const desc = "Just a test command",
+const desc = "A message is entered every time the bot is started. This is a collection of all those messages.",
       args = "<day> <page>";
 const execute = (message, command) => {
   var devlogPath = `${__basedir}/data/bot/starts.json`,
@@ -17,7 +17,7 @@ const execute = (message, command) => {
   }
   if (command.getArgs().length > 0) {
     var day = command.getArgs()[0];
-    output += `*${new Date(day*86400000).toLocaleDateString("en-US")}*:\n`;
+    output += `*${new Date(day*86400000+86400000).toLocaleDateString("en-US")}*:\n`;
     var i = 0;
     for (var time in days[day]) {
       i++;
@@ -36,7 +36,7 @@ const execute = (message, command) => {
       for (var time in days[day]) {
         count++;
       }
-      output += `**${new Date(day*86400000).toLocaleDateString("en-US")}** (${day}): ${count}\n`;
+      output += `**${new Date(day*86400000+86400000).toLocaleDateString("en-US")}** (${day}): ${count}\n`;
     }
   }
 
