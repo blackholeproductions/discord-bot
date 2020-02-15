@@ -3,6 +3,7 @@ const md5      = require('md5'),
       modules  = require('./modules.js'),
       json     = require('./json.js'),
       xp       = require('./xp.js'),
+      counting = require('./counting.js'),
       readline = require('readline');
 
 /*
@@ -141,6 +142,7 @@ function generateRandomNumber(min, max) {
 exports.generateRandomNumber = generateRandomNumber;
 exports.askQuestion = askQuestion;
 exports.xp = xp;
+exports.counting = counting;
 exports.json = json;
 exports.modules = modules;
 exports.setCommandDescription = setCommandDescription;

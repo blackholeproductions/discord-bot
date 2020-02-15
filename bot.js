@@ -104,11 +104,29 @@ function execute(startmsg) {
 
   client.on('message', message => {
     if (message.guild == null) return;
-    if (util.xp.isEnabled(message.guild.id)) {
-      util.xp.addXP(message.author.id, message.guild.id);
+    if (util.modules.isEnabled("counting", message.guild.id)) { // Handle counting module
+      if (util.counting.isChannel(message.guild.id, message.channel.id)) {
+        if (!util.counting.isValidCount(message.guild.id, parseInt(message.content), message.author.id)) {
+          message.delete(1000); // Delete message if it is not valid
+        } else {
+          util.counting.count(message.guild.id, message.author.id); // Add to count if it is valid
+          if (util.xp.isEnabled(message.guild.id)) {
+            util.xp.addXP(message.author.id, message.guild.id, 5); // Add 5 xp for counting
+          }
+        }
+        return;
+      }
     }
-    var prefix = util.getServerPrefix(message.guild.id);
-    console.log(`${util.timestamp()} ${message.author.tag} (${message.channel.name}): ${message.content}`);
+    if (util.xp.isEnabled(message.guild.id)) {
+      var levelBefore = util.xp.getLevel(message.author.id, message.guild.id);
+      util.xp.addXP(message.author.id, message.guild.id); // Add default xp
+      var levelAfter = util.xp.getLevel(message.author.id, message.guild.id);
+      if (levelAfter > levelBefore) {
+        message.channel.send(`**${message.author.username}** has advanced to level **${levelAfter}**!`);
+      }
+    }
+    var prefix = util.getServerPrefix(message.guild.id); // get server prefix
+    console.log(`${util.timestamp()} ${message.author.tag} (${message.channel.name}): ${message.content}`); // log message
     // Check if message contains prefix (with the exception of the u!setprefix command)
     if (message.content.startsWith(config.prefix)) { // Check for u!setprefix
       var cmdName = message.content.split(config.prefix)[1].split(" ")[0];

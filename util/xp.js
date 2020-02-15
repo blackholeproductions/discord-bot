@@ -11,10 +11,11 @@ function isEnabled(id) {
 ** addXP(user, guild, amount) / getXP (user, guild)
 ** Description: get xp from/add xp to user in server
 */
-function addXP(user, guild, amount) {
+function addXP(user, guild, amount, skipCooldown) {
   var path = util.json.getServerJSON(guild);
   var data = util.json.JSONFromFile(path);
-  if (hasXPCooldown(user) && !amount) return; // check if amount is specified, and if so, skip xp cooldown
+  if (skipCooldown == undefined && amount) skipCooldown = true; // default skipCooldown to true if the amount is specified
+  if (hasXPCooldown(user) && !skipCooldown) return; // stop user from gaining xp if an xp cooldown is active unless it has been specified that the cooldown should be skipped
   if (!amount && !(amount < 0)) amount = getExpGained(getLevel(user, guild));
   if (data.xp == undefined) data.xp = {}; // if the server hasn't used xp before, add the object so js doesn't scream undefined
   if (data.xp[user] == undefined) data.xp[user] = 0; //set xp to 0 if it doesn't exist
