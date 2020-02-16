@@ -1,5 +1,5 @@
 function execute(startmsg) {
-  const Discord = require('discord.js');
+  global.Discord = require('discord.js');
   global.__basedir = __dirname; // global variable that stores base directory
   global.datapath = `${__basedir}/data`;
   global.commands = {};
@@ -121,8 +121,8 @@ function execute(startmsg) {
       var levelBefore = util.xp.getLevel(message.author.id, message.guild.id);
       util.xp.addXP(message.author.id, message.guild.id); // Add default xp
       var levelAfter = util.xp.getLevel(message.author.id, message.guild.id);
-      if (levelAfter > levelBefore) {
-        message.channel.send(`**${message.author.username}** has advanced to level **${levelAfter}**!`);
+      if (levelAfter > levelBefore && message.author.id !== client.user.id) {
+        message.channel.send(`**${message.member.nickname ? message.member.nickname : message.author.username}** has advanced to level **${levelAfter}**!`);
       }
     }
     var prefix = util.getServerPrefix(message.guild.id); // get server prefix
@@ -158,6 +158,13 @@ function execute(startmsg) {
       }
     }
   });
+
+  client.on('messageReactionAdd', (reaction, user) => {
+    if (reaction.users.has(client.user.id)) {
+      util.pages.handlePages(reaction, user);
+    }
+  });
+
 
   client.login(config.token);
 }

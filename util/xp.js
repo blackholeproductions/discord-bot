@@ -50,7 +50,7 @@ function getLevel(user, guild) {
   if (data.xp == undefined) data.xp = {};
   if (data.xp[user] == undefined) data.xp[user] = 0; // same as above function
   var level = 1;
-  for (var i = 1; i < 60; i++) {
+  for (var i = 1; i <= 60; i++) {
     //13.88888889 x3 + 195.2380952 x2 + 195.6349206 x
     var currentxp = Math.round(13.88888889*Math.pow(i, 3)+195.2380952*Math.pow(i, 2)+195.6349206*i);
     if (data.xp[user] > currentxp) {
@@ -60,8 +60,17 @@ function getLevel(user, guild) {
   return level;
 }
 /*
+** getMinXP(level)
+** Description: get minimum xp for required for level
+*/
+function getMinXP(level) {
+  level = level - 1;
+  return Math.round(13.88888889*Math.pow(level, 3)+195.2380952*Math.pow(level, 2)+195.6349206*level);
+}
+
+/*
 ** getExpGained(level)
-** Description: get xp gained for level
+** Description: get default xp gained for level
 */
 function getExpGained(level) {
   return 45 + (5 * level) + util.generateRandomNumber(0, level);
@@ -94,23 +103,21 @@ function startXPCooldowns() {
 }
 /*
 ** getLeaderboard(id, page)
-** Description: start the xp timers
-** Comment: get a leaderboard string
+** Description: get a leaderboard string
 */
 function getLeaderboard(id, page) {
   page = page || 1;
   var pageSize = 10,
       output   = "",
       path     = util.json.getServerJSON(id),
-      data     = util.json.JSONFromFile(path),
-      output   = "";
+      data     = util.json.JSONFromFile(path);
   if (data.xp == undefined) return "There is no xp data for this server.";
   // Sort by putting in array and using the sort() function
   var array = [];
   for (var xp in data.xp) {
     array.push({ id: xp, xp: data.xp[xp] });
   }
-  array.sort(function(a, b) {
+  array.sort(function(a, b) { // sort
     return b.xp - a.xp;
   });
   // get day for showing today's xp gained in leaderboardChannelID
@@ -127,12 +134,37 @@ function getLeaderboard(id, page) {
     if (i < (page-1)*pageSize+(page-1)) continue; // Page system
     if (i > page*pageSize) break;
     var member = client.guilds.get(id).members.get(array[object].id);
-    var xptoday = data.xp.history[day][member.user.id];
     if (member == undefined) member = { user: { username: "Unknown", id: "Unknown"} }; // Replace username with "Unknown" since we don't know what their real username is
+    var xptoday = data.xp.history[day][member.user.id];
     output += `${i}. **<@${member.user.id}>** - ${getXP(array[object].id, id)} xp${xptoday !== undefined ? " (" : ""}${xptoday >= 0 ? "+" : ""}${xptoday < 0 ? "-" : ""}${xptoday !== undefined ? `${xptoday} gained today` : ""}${xptoday !== undefined ? ")" : ""}, Level ${getLevel(array[object].id, id)}${util.modules.isEnabled("xp-roles", id) ? ` <@&${getHighestRole(id, getLevel(array[object].id, id))}>` : ""}\n`;
   }
   output += `Page ${Math.ceil((i-1)/pageSize)}`;
   return output;
+}
+/*
+** getLeaderboardRank(guildID, userID)
+** Description: return rank of user
+*/
+function getLeaderboardRank(guildID, userID) {
+  var path     = util.json.getServerJSON(guildID),
+      data     = util.json.JSONFromFile(path);
+  // Sort by putting in array and using the sort() function
+  var array = [];
+  for (var xp in data.xp) {
+    array.push({ id: xp, xp: data.xp[xp] });
+  }
+  array.sort(function(a, b) {
+    return b.xp - a.xp;
+  });
+  var i = 0;
+  for (var object in array) {
+    if (isNaN(parseInt(array[object].id))) continue; // Handle non-users in xp object
+    if (array[object].id == "672280373065154569") continue; // Skip bot user from leaderboard
+    i++;
+    if (array[object].id !== userID) continue;
+    return i;
+  }
+  return "Unknown Rank";
 }
 /*
 ** setLeaderboardMessage(guildID, channelid, messageid)
@@ -203,7 +235,7 @@ function updateRoles(userID, guildID) {
   }
 }
 /*
-** getHighestRole(level)
+** getHighestRole(guildID, level)
 ** Description: gets highest role for specific level
 */
 function getHighestRole(guildID, level) {
@@ -218,7 +250,48 @@ function getHighestRole(guildID, level) {
   }
   return output;
 }
+/*
+** getNextHighestRole(guildID, level)
+** Description: gets next highest role for specific level
+*/
+function getNextHighestRole(guildID, level) {
+  var path = util.json.getServerJSON(guildID),
+      data = util.json.JSONFromFile(path),
+      output = "`No role`";
+  if (data.xp.roles == undefined) data.xp.roles = {}; // Add roles object if it doesn't already exist
+  var roleIsNextHighest = false;
+  for (var role in data.xp.roles) {
+    if (roleIsNextHighest) {
+      output = role;
+      break;
+    }
+    if (level <= data.xp.roles[role]) {
+      roleIsNextHighest = true;
+    }
+  }
+  return output;
+}
+/*
+** getMinimumXPForRole(guildID, roleID)
+** Description: gets minimum XP needed to have a role
+*/
+function getMinimumXPForRole(guildID, roleID) {
+  var path = util.json.getServerJSON(guildID),
+      data = util.json.JSONFromFile(path),
+      output = 0;
+  if (data.xp.roles == undefined) data.xp.roles = {}; // Add roles object if it doesn't already exist
+  for (var role in data.xp.roles) {
+    if (roleID == role) {
+      output = getMinXP(data.xp.roles[role]);
+    }
+  }
+  return output;
+}
 
+exports.getMinXP = getMinXP;
+exports.getNextHighestRole = getNextHighestRole;
+exports.getMinimumXPForRole = getMinimumXPForRole;
+exports.getLeaderboardRank = getLeaderboardRank;
 exports.getHighestRole = getHighestRole;
 exports.removeRole = removeRole;
 exports.updateRoles = updateRoles;

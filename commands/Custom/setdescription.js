@@ -15,6 +15,7 @@ const execute = (message, command) => {
     }
     if (json.commands[cmdName] != undefined) { // Check if command exists
       util.setCommandDescription(message.guild.id, cmdName, description);
+      message.channel.send("Set description successfully.");
     } else {
       message.channel.send(`Command *${cmdName}* does not exist!`);
     }
