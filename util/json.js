@@ -16,7 +16,7 @@ function JSONFromFile(path) {
 ** Comment:
 */
 function writeJSONToFile(data, path) {
-  fs.writeFileSync(path, JSON.stringify(data, null, 2)); // "null, 2" makes the file humanly readable ig
+  fs.writeFileSync(path, JSON.stringify(data)); // "data, null, 2" makes the file humanly readable if necessary
 }
 
 /*
@@ -25,9 +25,33 @@ function writeJSONToFile(data, path) {
 ** Comment:
 */
 function getServerJSON(id) {
-  return `${datapath}/server/${id}.json`;
+  var file = `${datapath}/server/${id}.json`;
+  if (!fs.existsSync(file)) {
+    var defaultJson = {
+      prefix: config.prefix,
+      commands: {
+        descriptions: {}
+      },
+      modules: {}
+    }
+    writeJSONToFile(defaultJson, file);
+  }
+  return file;
+}
+
+/*
+** getUserJSON()
+** Description: Get path to user's json file
+*/
+function getUserJSON(id) {
+  var file = `${datapath}/user/${id}.json`;
+  if (!fs.existsSync(file)) {
+    writeJSONToFile({}, file);
+  }
+  return file;
 }
 
 exports.JSONFromFile = JSONFromFile;
 exports.writeJSONToFile = writeJSONToFile;
 exports.getServerJSON = getServerJSON;
+exports.getUserJSON = getUserJSON;

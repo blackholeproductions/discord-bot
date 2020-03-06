@@ -3,7 +3,7 @@ const desc = "A message is entered every time the bot is started. This is a coll
 const execute = async (message, command) => {
   var day  = command.getArgs()[0],
       page = command.getArgs()[1] || 1;
-  const m = await message.channel.send(util.getDevlog(day, page));
+  const m = await message.channel.send(util.getDevlog(page, day));
   util.pages.addPageMessage(m.id, m.channel.id, message.author.id, page, "devlog", { day: day });
 }
 

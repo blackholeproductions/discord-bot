@@ -1,0 +1,4 @@
+{
+  "description": "Module that allows you to use a timer",
+  "tutorial": "Use -startimer to start, user -stoptimer to stop. Your time will be given when you do -stoptimer, or you can do -checktimer"
+}

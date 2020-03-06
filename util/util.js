@@ -1,20 +1,26 @@
-const md5      = require('md5'),
-      fs       = require('fs'),
-      modules  = require('./modules.js'),
-      json     = require('./json.js'),
-      xp       = require('./xp.js'),
-      counting = require('./counting.js'),
-      pages    = require('./pages.js'),
-      readline = require('readline');
+const md5        = require('md5'),
+      fs         = require('fs'),
+      modules    = require('./modules.js'),
+      json       = require('./json.js'),
+      xp         = require('./xp.js'),
+      counting   = require('./counting.js'),
+      pages      = require('./pages.js'),
+      currency   = require('./currency.js'),
+      marriage   = require('./marriage.js'),
+      todo       = require('./todo.js'),
+      timers     = require('./timers.js'),
+      moderation = require('./moderation.js'),
+      joinleave  = require('./joinleave.js'),
+      readline   = require('readline');
 /*
 ** seededRand()
 ** Description: Turns a string into a number (same output for same string)
 ** Comment: rewritten, brand new
 */
 
-const seededRand = (seed, localseed) => {
+const seededRand = (seed, serverID, localseed) => {
   var random = 0;
-  if (localseed == 0 || isNaN(localseed)) localseed = 78125.905218;
+  var localseed = getSeed(serverID) || 78125.905218;
 
   var randomize = function(value) {
     var newvalue = 0;
@@ -30,6 +36,26 @@ const seededRand = (seed, localseed) => {
   return random;
 }
 
+/*
+** setSeed()
+** Description: Sets seed for server
+*/
+function setSeed(serverID, seed) {
+  if (isNaN(seed) || !isFinite(parseInt(seed))) return;
+  var path = json.getServerJSON(serverID);
+  var data = json.JSONFromFile(path);
+  data.seed = parseInt(seed);
+  json.writeJSONToFile(data, path);
+}
+/*
+** getSeed()
+** Description: Sets seed for server
+*/
+function getSeed(serverID) {
+  var path = json.getServerJSON(serverID);
+  var data = json.JSONFromFile(path);
+  return data.seed;
+}
 /*
 ** timestamp()
 ** Description: Returns a timestamp
@@ -69,6 +95,7 @@ function cmdCount() {
 */
 function getServerPrefix(id) {
   var data = json.JSONFromFile(json.getServerJSON(id));
+  if (data.prefix == undefined) return config.prefix;
   return data.prefix;
 }
 
@@ -140,18 +167,17 @@ function generateRandomNumber(min, max) {
 }
 /*
 ** getHelpMenu(guildID, page, helpType)
-** Description: return the help menu for a server
+** Description: return the help menu for a user
 */
-function getHelpMenu(guildID, page, helpType) {
-  var server     = helpType == "server" || helpType == "all" || helpType == undefined,         // whether we want server commands or not
-      bot        = helpType == "bot" || helpType == "all" || helpType == undefined,            // whether we want bot commands or not
-      servercmds = util.json.JSONFromFile(util.json.getServerJSON(guildID)).commands,          // list of server commands
-      prefix     = util.getServerPrefix(guildID),                                              // server prefix
-      cmdlist    = { servercmds: {} },                                                         // list of commands and their descriptions
-      length     = 0,                                                                          // length of cmdlist
-      pageSize   = 10,                                                                         // size of each page
-      draft      = "",
-      embed      = new Discord.RichEmbed();                                                    // embed to return
+function getHelpMenu(guildID, userID, page, helpType) {
+  var server     = helpType == "server" || helpType == "all" || helpType == undefined, // whether we want server commands or not
+      bot        = helpType == "bot" || helpType == "all" || helpType == undefined,    // whether we want bot commands or not
+      servercmds = util.json.JSONFromFile(util.json.getServerJSON(guildID)).commands,  // list of server commands
+      prefix     = util.getServerPrefix(guildID),                                      // server prefix
+      cmdlist    = { servercmds: {} },                                                 // list of commands and their descriptions
+      length     = 0,                                                                  // length of cmdlist
+      pageSize   = 10,                                                                 // size of each page
+      embed      = new Discord.RichEmbed();                                            // embed to return
   var genCmdObj = function(desc, category) {
     var obj = {
       description: desc,
@@ -179,7 +205,7 @@ function getHelpMenu(guildID, page, helpType) {
       } else {
         category = '';
       }
-      if (util.modules.isEnabled(modulecmds[cmd].module, guildID)) {
+      if (util.modules.isEnabled(modulecmds[cmd].module, guildID) || util.modules.isEnabledUser(modulecmds[cmd].module, userID)) {
         cmdlist[cmd] = genCmdObj(modulecmds[cmd].desc, category);
         length++;
       }
@@ -217,13 +243,29 @@ function getHelpMenu(guildID, page, helpType) {
     var categoryBody = "";
     for (var command in categories[category]) {
       var cmd = commands[command] || modulecmds[command];
-      categoryBody += `  *${prefix}${command}${cmd.args ? ` ${cmd.args}` : ""}* - ${categories[category][command].description}\n`;
+      var aliases = [];
+      for (var alias in cmd.aliases) {
+        if (cmd.aliases[alias] !== command) {
+          aliases.push(cmd.aliases[alias])
+        }
+      }
+      categoryBody += `${prefix}${command} ${cmd.args} - ${cmd.desc}\
+${cmd.ex !== "" ? `\nExample: *${prefix}${cmd.ex}*` : ""}\
+${aliases.length > 0 ? `\n*Aliases: ${aliases}*` : ""}\n`;
     }
     embed.addField(`**${category} commands**`, `${categoryBody}`);
   }
 
   for (var command in nonCategoryCmds) {
-    embed.addField(`${prefix}${command} ${commands[command].args}`, `${nonCategoryCmds[command].description}`);
+    var aliases = [];
+    for (var alias in command.aliases) {
+      if (command.aliases[alias] !== command) {
+        aliases.push(command.aliases[alias])
+      }
+    }
+    embed.addField(`${prefix}${command} ${commands[command].args}`, `${commands[command].desc}\
+${commands[command].ex !== "" ? `\nExample: *${prefix}${commands[command].ex}*` : ""}\
+${aliases.length > 0 ? `\n*Aliases: ${aliases}*` : ""}`);
   }
   if (iteration <= page*pageSize-1) embed.addField("**Server Commands**", "**Commands specific to this server**");
   for (var command in cmdlist.servercmds) {
@@ -235,13 +277,17 @@ function getHelpMenu(guildID, page, helpType) {
 
   return embed;
 }
-
-function getDevlog(day, page) {
+/*
+** getDevlog(day, pagee)
+** Description: get the devlog (for page system)
+*/
+function getDevlog(page, day) {
   var devlogPath = `${__basedir}/data/bot/starts.json`,
       devlog     = util.json.JSONFromFile(devlogPath),
       output     = "",
       days       = {},
-      pageSize   = 10;
+      pageSize   = 10,
+      embed = new Discord.RichEmbed();
   for (var time in devlog) {
     var date = new Date(parseInt(time));
     var today = Math.floor((date.getTime()-date.getTimezoneOffset()*60000)/86400000); // Get number of days since epoch (timezone stuff cus it was off by that many hours)
@@ -251,7 +297,7 @@ function getDevlog(day, page) {
     days[today][time] = devlog[time];
   }
   if (day) {
-    output += `*${new Date(day*86400000+86400000).toLocaleDateString("en-US")}*:\n`;
+    embed.setTitle(`Devlog for *${new Date(day*86400000+86400000).toLocaleDateString("en-US")}*:`);
     var i = 0;
     for (var time in days[day]) {
       i++;
@@ -263,18 +309,139 @@ function getDevlog(day, page) {
     for (var time in days[day]) {
       count++;
     }
-    output += `Page ${page}/${Math.ceil(count/pageSize)}`;
+    embed.setFooter(`Page ${page}/${Math.ceil(count/pageSize)}`);
   } else { // if no day specified
+    var i = 0;
+    embed.setTitle(`List of Available Devlogs`);
     for (var day in days) {
+      i++;
+      if (i < (page-1)*pageSize) continue;
+      if (i > page*pageSize) break;
       var count = 0;
       for (var time in days[day]) {
         count++;
       }
       output += `**${new Date(day*86400000+86400000).toLocaleDateString("en-US")}** (${day}): ${count}\n`;
     }
+    var count = 0;
+    for (var time in days) {
+      count++;
+    }
+    embed.setFooter(`Page ${page}/${Math.ceil(count/pageSize)}`);
+  }
+  embed.setDescription(output);
+  return embed;
+}
+/*
+** removeAllBut(string, character, number)
+** Description: remove all "${character}"s except for the last ${number} in ${string}
+*/
+function removeAllBut(string, character, number) {
+  var arr = string.split(character);
+  if (arr.length-1 <= number) return string; // Return if there are not enough occurences
+  var occurences = 0;
+  var outputString = ""
+  for (var i=arr.length-1; i >= 0; i--) {
+    if (occurences < number) {
+      outputString = character+arr[i]+outputString;
+      occurences++;
+    } else {
+      outputString = arr[i]+outputString;
+    }
+  }
+  return outputString;
+}
+/*
+** countOccurences(string, character)
+** Description: return number of ${character}s in ${string}
+*/
+function countOccurences(string, character) {
+  return string.split(character).length-1;
+}
+/*
+** numberWithCommas(x)
+** Description: return number with commas
+*/
+function numberWithCommas(x) {
+  var parts = x.toString().split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return parts.join(".");
+}
+/*
+** countKeys(obj)
+** Description: counts the number of keys in an object recursively
+*/
+function countKeys(obj) {
+  if (typeof obj !== 'object' || obj === null) {
+    return 0;
+  }
+  const keys = Object.keys(obj);
+  let sum = keys.length;
+  keys.forEach(key => sum += countKeys(obj[key]));
+  return sum;
+}
+/*
+** incrementVersion()
+** Description: increments the version number
+*/
+function incrementVersion() {
+  var path = `${__basedir}/data/bot/bot.json`;
+  var data = json.JSONFromFile(path);
+  if (data.version == undefined) data.version = 0;
+  data.version += 1;
+  data.date = new Date(Date.now());
+  json.writeJSONToFile(data, path);
+}
+/*
+** getDateFormatted(debug)
+** Description: formats the given date
+*/
+function getDateFormatted(d) {
+  return ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
+    d.getFullYear() + " " + ("0" + (d.getHours()+d.getTimezoneOffset()/60)).slice(-2) + ":" +
+    ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
+}
+/*
+** progressBar(percentage, size)
+** Description: get progress bar  thing
+*/
+function progressBar(percentage, size) {
+  var output = "";
+  var filled = Math.round((percentage/100)*size);
+  var unfilled = size-filled;
+  for (var i = 0; i < filled; i++) {
+    output += "█";
+  }
+  for (var i = 0; i < unfilled; i++) {
+    output += "░";
   }
   return output;
 }
+function getCommandFromAlias(alias) {
+  for (var command in commands) {
+    if (commands[command].aliases.includes(alias)) return commands[command];
+  }
+  for (var command in modulecmds) {
+    if (modulecmds[command].aliases.includes(alias)) return modulecmds[command];
+  }
+}
+
+exports.getCommandFromAlias = getCommandFromAlias;
+exports.joinleave = joinleave;
+exports.moderation = moderation;
+exports.progressBar = progressBar;
+exports.timers = timers;
+exports.getDateFormatted = getDateFormatted;
+exports.countKeys = countKeys;
+exports.incrementVersion = incrementVersion;
+exports.numberWithCommas = numberWithCommas;
+exports.setSeed = setSeed;
+exports.getSeed = getSeed;
+exports.countOccurences = countOccurences;
+exports.removeAllBut = removeAllBut;
+exports.todo = todo;
+exports.marriage = marriage;
+exports.currency = currency;
 exports.getDevlog = getDevlog;
 exports.getHelpMenu = getHelpMenu;
 exports.pages = pages;

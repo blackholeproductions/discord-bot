@@ -14,7 +14,13 @@ const enable = (mod, id) => {
   data.modules[mod] = true;
   util.json.writeJSONToFile(data, path);
 }
-
+const enableUser = (mod, id) => {
+  var path = util.json.getUserJSON(id);
+  var data = util.json.JSONFromFile(path);
+  if (data.modules == undefined) data.modules = {};
+  data.modules[mod] = true;
+  util.json.writeJSONToFile(data, path);
+}
 /*
 ** isEnabled()
 ** Description: Checks if the given module is enabled in the given server
@@ -26,10 +32,14 @@ const isEnabled = (mod, id) => {
   if (data.modules == undefined || data.modules[mod] == undefined) return false;
   if (data.modules[mod]) return true; else return false;
 }
+const isEnabledUser = (mod, id) => {
+  var data = util.json.JSONFromFile(util.json.getUserJSON(id));
+  if (data.modules == undefined || data.modules[mod] == undefined) return property(mod, "enabled_by_default");
+  if (data.modules[mod]) return true;
+}
 /*
-** disable()
+** disable(mod, id)
 ** Description: disables the given module in the given server
-** Comment:
 */
 
 const disable = (mod, id) => {
@@ -38,11 +48,44 @@ const disable = (mod, id) => {
   if (data.modules[mod] != undefined) {
     delete data.modules[mod];
     util.json.writeJSONToFile(data, path);
-  } else console.log(`Couldn't find module ${mod} for ${serverid}`);
+  } else console.log(`Couldn't find module ${mod} for server ${id}`);
 }
-
-
+/*
+** disableUser(mod, id)
+** Description: disables the given module for the given user.
+*/
+const disableUser = (mod, id) => {
+  var path = util.json.getUserJSON(id);
+  var data = util.json.JSONFromFile(path);
+  if (data.modules[mod] != undefined) {
+    delete data.modules[mod];
+    util.json.writeJSONToFile(data, path);
+  } else console.log(`Couldn't find module ${mod} for user ${id}`);
+}
+/*
+** property(mod, id, property)
+** Description: gets a property of a module
+*/
+const property = (mod, property) => {
+  var selectedmodule;
+  if (modules[mod] !== undefined && modules[mod][property] !== undefined) {
+    selectedmodule = modules[mod];
+  } else if (usermodules[mod] !== undefined && usermodules[mod][property] !== undefined) {
+    selectedmodule = usermodules[mod];
+  } else {
+    return false;
+  }
+  if (property == "tutorial") {
+    return selectedmodule[property].replace(/\${serverprefix}/g, util.getServerPrefix(id));
+  } else {
+    return selectedmodule[property];
+  }
+}
 
 exports.enable = enable;
 exports.isEnabled = isEnabled;
 exports.disable = disable;
+exports.enableUser = enableUser;
+exports.isEnabledUser = isEnabledUser;
+exports.disableUser = disableUser;
+exports.property = property;

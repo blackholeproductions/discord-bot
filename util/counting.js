@@ -31,7 +31,9 @@ function isValidCount(guildID, count, userID) {
   var data = util.json.JSONFromFile(path);
   if (data.counting == undefined) data.counting = {};
   if (data.counting.count == undefined) data.counting.count = 0;
-  if (count == data.counting.count+1 && userID !== data.counting.user) return true;
+  if (count.includes(" ")) return false;
+  if (isNaN(count)) return false;
+  if (parseInt(count) == data.counting.count+1 && userID !== data.counting.user) return true;
   return false;
 }
 /*

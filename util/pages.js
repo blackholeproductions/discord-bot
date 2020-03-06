@@ -45,10 +45,28 @@ function updateMessage(messageID, type, page) {
       message.edit(util.xp.getLeaderboard(message.guild.id, page));
       break;
     case "devlog":
-      message.edit(util.getDevlog(messages[messageID].day, page));
+      message.edit(util.getDevlog(page, messages[messageID].day));
       break;
     case "help":
-      message.edit(util.getHelpMenu(message.guild.id, page, messages[messageID].helpType));
+      message.edit(util.getHelpMenu(message.guild.id, message.author.id, page, messages[messageID].helpType));
+      break;
+    case "levelUpMessages":
+      message.edit(util.xp.formatLevelUpMessages(message.guild.id, messages[messageID].user.id, page));
+      break;
+    case "todoList":
+      message.edit(util.todo.getList(messages[messageID].id, page, messages[messageID].project));
+      break;
+    case "todoProjectList":
+      message.edit(util.todo.projectList(messages[messageID].id, page));
+      break;
+    case "activity":
+      message.edit(util.xp.getXPHistory(message.guild.id, messages[messageID].id, page));
+      break;
+    case "baltop":
+      message.edit(util.currency.topBalances(message.guild.id, page));
+      break;
+    case "global-leaderboard":
+      message.edit(util.xp.getGlobalLeaderboard(page));
       break;
     default:
       message.edit(`something has gone horribly wrong.\n\`\`\`${messages[reaction.message.id]}\`\`\``);

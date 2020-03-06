@@ -1,4 +1,4 @@
-const desc = "Just a test command";
+const desc = "Just a test command (Also the first command ever added)";
 const execute = (message, command) => {
   message.channel.send('testy');
 }

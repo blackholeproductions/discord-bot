@@ -4,12 +4,12 @@ const util = require(__basedir+"/util/util.js"),
       args = "<waifu>";
 
 const execute = (message, command) => {
-  var waifu = command.getArgs()[0];
-  if (command.getArgs().length != 1) {
+  var waifu = command.getArgs().join(' ');
+  if (command.getArgs().length == 0) {
     message.channel.send("You need to specify the waifu to rate.");
     return;
   }
-  var random = parseInt(util.seededRand(waifu).toString().substring(4, 6)); // Tested a few different parts of the seededRand outputs, this seems to be the most random (with a slight lean toward 0 of about 4%)
+  var random = parseInt(util.seededRand(waifu, message.guild.id).toString().substring(4, 6)); // Tested a few different parts of the seededRand outputs, this seems to be the most random (with a slight lean toward 0 of about 4%)
   var zeroOrTen = function(value) {
     for (var i = 0, zero = false; i < 5; i++) { // For values 0-4 (5 values/10 total possible so equal chance of 0 and 10), set value to 0.
       if (value.toString().startsWith(i.toString())) zero = true;

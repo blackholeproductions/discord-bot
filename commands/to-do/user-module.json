@@ -1,0 +1,5 @@
+{
+  "description": "Gives you access to a todo list",
+  "tutorial": "To add to your to-do list, do the ${serverprefix}todoadd command. *Ex: ${serverprefix}todoadd thing*\nTo add to a certain project, append the project name at the end within quotes. *Ex: ${serverprefix}todoadd thing \"project\"*\nTo create a new project, use the ${serverprefix}createproject <project name> command. This will allow you to have seperate to-do lists for different things. You can also set a different project as your default using ${serverprefix}tododefault <project name> *Ex: ${serverprefix}createproject abc, ${serverprefix}tododefault abc*\n${serverprefix}todoremove and ${serverprefix}todocomplete use the numbers seen when you do the ${serverprefix}todo command. To mark an item as complete, or to remove it from the list completely, specify the number next to the item like ${serverprefix}todoremove <index>. You can also specify the project in the same way as the ${serverprefix}todoadd command. *Ex: ${serverprefix}todoremove 5*",
+  "enabled_by_default": true
+}
