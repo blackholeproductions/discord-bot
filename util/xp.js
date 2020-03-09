@@ -133,7 +133,7 @@ function startXPCooldowns() {
 ** getLeaderboard(id, page)
 ** Description: get a leaderboard string
 */
-function getLeaderboard(id, page) {
+function getLeaderboard(id, page, bot) {
   page = page || 1;
   var pageSize = 10,
       output   = "",
@@ -161,8 +161,7 @@ function getLeaderboard(id, page) {
   var i = 0;
   for (var object in array) {
     if (isNaN(parseInt(array[object].id))) continue; // Handle non-users in xp object
-    if (array[object].id == "672280373065154569") continue; // Skip bot user from leaderboard
-    if (client.guilds.get(id).members.get(array[object].id) !== undefined && client.guilds.get(id).members.get(array[object].id).user.bot) continue; // Skip user if they are a bot
+    if (client.guilds.get(id).members.get(array[object].id) !== undefined && client.guilds.get(id).members.get(array[object].id).user.bot && !bot) continue; // Skip user if they are a bot unless bot argument is true
     i++;
     if (i < (page-1)*pageSize+(page-1)) continue; // Page system
     if (i > page*pageSize) break;
@@ -199,8 +198,7 @@ function getLeaderboardRank(guildID, userID) {
   var i = 0;
   for (var object in array) {
     if (isNaN(parseInt(array[object].id))) continue; // Handle non-users in xp object
-    if (array[object].id == "672280373065154569") continue; // Skip bot user from leaderboard
-    if (client.guilds.get(guildID).members.get(array[object].id) !== undefined && client.guilds.get(guildID).members.get(array[object].id).user.bot) continue; // Skip user if they are a bot
+    if (client.guilds.get(guildID).members.get(array[object].id) !== undefined && client.guilds.get(guildID).members.get(array[object].id).user.bot && array[object].id !== userID) continue; // Skip user if they are a bot
     i++;
     if (array[object].id !== userID) continue;
     return i;

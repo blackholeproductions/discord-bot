@@ -80,7 +80,7 @@ function setCurrencySymbol(guild, symbol) {
   var path = util.json.getServerJSON(guild);
   var data = util.json.JSONFromFile(path);
   if (data.currency == undefined) data.currency = {};
-  data.currency.symbol = name;
+  data.currency.symbol = symbol;
   util.json.writeJSONToFile(data, path);
 }
 /*
@@ -113,7 +113,7 @@ function topBalances(guild, page) {
     if (i > page*pageSize) break;
     var member = client.guilds.get(guild).members.get(array[object].id);
     if (member == undefined) member = { user: { username: "Unknown", id: array[object].id} }; // Replace username with "Unknown" since we don't know what their real username is
-    var string = `${i}. <@${member.user.id}> - ${get(guild, member.user.id)} ${getCurrencyName(guild)}\n`;
+    var string = `${i}. <@${member.user.id}> - ${get(guild, member.user.id)} ${getCurrencyName(guild)}${get(guild, member.user.id) !== 1 ? "s" : ""}\n`;
     if (i == 1) {
       output += `**${string}**`;
       embed.setThumbnail(`${member.user.displayAvatarURL ? member.user.displayAvatarURL : ""}`);
@@ -150,9 +150,9 @@ function startCooldowns() {
 exports.add = add;
 exports.set = set;
 exports.get = get;
-  exports.getCurrencyName = getCurrencyName;
-  exports.setCurrencyName = setCurrencyName;
-  exports.getCurrencySymbol = getCurrencySymbol;
+exports.getCurrencyName = getCurrencyName;
+exports.setCurrencyName = setCurrencyName;
+exports.getCurrencySymbol = getCurrencySymbol;
 exports.setCurrencySymbol = setCurrencySymbol;
 exports.startCooldowns = startCooldowns;
 exports.hasCooldown = hasCooldown;

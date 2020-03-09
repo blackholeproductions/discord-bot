@@ -42,7 +42,7 @@ function updateMessage(messageID, type, page) {
   var type = messages[messageID].type;
   switch(type) {
     case "leaderboard":
-      message.edit(util.xp.getLeaderboard(message.guild.id, page));
+      message.edit(util.xp.getLeaderboard(message.guild.id, page, messages[messageID].bot));
       break;
     case "devlog":
       message.edit(util.getDevlog(page, messages[messageID].day));
