@@ -2,7 +2,7 @@ const desc = "Get activity history of user",
       args = "<user>";
 const execute = async (message, command) => {
   var page = 1;
-  var user = client.users.find("username", command.getArgs().join(" ")) || message.mentions.users.first() || message.author;
+  var user = client.users.cache.find(user => user.username ===  command.getArgs().join(" ")) || message.mentions.users.first() || message.author;
   if (user == undefined) {
     message.channel.send("You must specify a valid user.");
     return;

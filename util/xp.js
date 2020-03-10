@@ -139,7 +139,7 @@ function getLeaderboard(id, page, bot) {
       output   = "",
       path     = util.json.getServerJSON(id),
       data     = util.json.JSONFromFile(path),
-      embed    = new Discord.RichEmbed();
+      embed    = new Discord.MessageEmbed();
   if (data.xp == undefined) return "There is no xp data for this server.";
   // Sort by putting in array and using the sort() function
   var array = [];
@@ -156,22 +156,22 @@ function getLeaderboard(id, page, bot) {
   if (data.xp.history == undefined) data.xp.history = {};
   if (data.xp.history[day] == undefined) data.xp.history[day] = {};
   embed.setColor("#ff8080");
-  embed.setAuthor(`${client.guilds.get(id).name}`, `${client.guilds.get(id).iconURL}`);
+  embed.setAuthor(`${client.guilds.cache.get(id).name}`, `${client.guilds.cache.get(id).iconURL()}`);
   embed.setTitle("Leaderboard");
   var i = 0;
   for (var object in array) {
     if (isNaN(parseInt(array[object].id))) continue; // Handle non-users in xp object
-    if (client.guilds.get(id).members.get(array[object].id) !== undefined && client.guilds.get(id).members.get(array[object].id).user.bot && !bot) continue; // Skip user if they are a bot unless bot argument is true
+    if (client.guilds.cache.get(id).members.cache.get(array[object].id) !== undefined && client.guilds.cache.get(id).members.cache.get(array[object].id).user.bot && !bot) continue; // Skip user if they are a bot unless bot argument is true
     i++;
     if (i < (page-1)*pageSize+(page-1)) continue; // Page system
     if (i > page*pageSize) break;
-    var member = client.guilds.get(id).members.get(array[object].id);
+    var member = client.guilds.cache.get(id).members.cache.get(array[object].id);
     if (member == undefined) member = { user: { username: "Unknown", id: array[object].id} }; // Replace username with "Unknown" since we don't know what their real username is
     var xptoday = getXPGained(id, member.id, Math.floor((new Date(Date.now()).getTime())/86400000)); // days since epoch
     var string = `${i}. <@${member.user.id}> - ${getXP(array[object].id, id, true)} xp${xptoday !== undefined ? " (" : ""}${xptoday >= 0 ? "+" : ""}${xptoday < 0 ? "-" : ""}${xptoday !== undefined ? `${util.numberWithCommas(xptoday)} gained today` : ""}${xptoday !== undefined ? ")" : ""}, Level ${getLevel(array[object].id, id)}${util.modules.isEnabled("xp-roles", id) ? ` <@&${getHighestRole(id, getLevel(array[object].id, id))}>` : ""}\n`;
     if (i == 1) {
       output += `**${string}**`;
-      embed.setThumbnail(`${member.user.displayAvatarURL ? member.user.displayAvatarURL : ""}`);
+      embed.setThumbnail(`${member.user.displayAvatarURL() ? member.user.displayAvatarURL() : ""}`);
     } else output += string;
   }
   embed.setDescription(output);
@@ -198,7 +198,7 @@ function getLeaderboardRank(guildID, userID) {
   var i = 0;
   for (var object in array) {
     if (isNaN(parseInt(array[object].id))) continue; // Handle non-users in xp object
-    if (client.guilds.get(guildID).members.get(array[object].id) !== undefined && client.guilds.get(guildID).members.get(array[object].id).user.bot && array[object].id !== userID) continue; // Skip user if they are a bot
+    if (client.guilds.cache.get(guildID).members.cache.get(array[object].id) !== undefined && client.guilds.cache.get(guildID).members.cache.get(array[object].id).user.bot && array[object].id !== userID) continue; // Skip user if they are a bot
     i++;
     if (array[object].id !== userID) continue;
     return i;
@@ -218,7 +218,7 @@ function getXPatRank(guildID, rank) {
   for (var object in array) {
     if (isNaN(parseInt(array[object].id))) {delete array[object]; continue;}
     if (array[object].id == "672280373065154569") {delete array[object]; continue;}
-    if (client.guilds.get(guildID).members.get(array[object].id) !== undefined && client.guilds.get(guildID).members.get(array[object].id).user.bot) {delete array[object]; continue;}
+    if (client.guilds.cache.get(guildID).members.cache.get(array[object].id) !== undefined && client.guilds.cache.get(guildID).members.cache.get(array[object].id).user.bot) {delete array[object]; continue;}
   }
   array.sort(function(a, b) {
     return b.xp - a.xp;
@@ -249,7 +249,7 @@ function updateLeaderboard(guildID) {
       channelID = data.xp.leaderboardChannelID,
       messageID = data.xp.leaderboardMessageID;
   if (channelID == undefined || messageID == undefined) return;
-  client.guilds.get(guildID).channels.get(channelID).fetchMessage(messageID)
+  client.guilds.cache.get(guildID).channels.cache.get(channelID).messages.fetch(messageID)
     .then(msg => msg.edit(getLeaderboard(guildID)))
     .catch(`Error updating leaderboard in ${guildID}`);
 }
@@ -338,12 +338,12 @@ function updateRoles(userID, guildID) {
       data = util.json.JSONFromFile(path);
   if (data.xp.roles == undefined) data.xp.roles = {}; // Add roles object if it doesn't already exist
   for (var role in data.xp.roles) {
-    var member = client.guilds.get(guildID).members.get(userID); // Get the member
+    var member = client.guilds.cache.get(guildID).members.cache.get(userID); // Get the member
     if (member !== undefined && getLevel(userID, guildID) >= data.xp.roles[role] && getMinimumXPForRole(guildID, role) <= getMinimumXPForRole(guildID, getVisibleRole(guildID, userID))) {
-      member.addRole(role, "Reached level threshold"); // Add the role to the user
+      member.roles.add(role, "Reached level threshold"); // Add the role to the user
     } else {
-      if (member.roles.get(role) !== undefined) { // If the user has the role and they aren't high enough level to have it (or their visible role permits them to) remove it
-        member.removeRole(role, "Under level threshold");
+      if (member.roles.cache.get(role) !== undefined) { // If the user has the role and they aren't high enough level to have it (or their visible role permits them to) remove it
+        member.roles.remove(role, "Under level threshold");
       }
     }
   }
@@ -445,10 +445,10 @@ function addLevelUpMessage(guildID, channelID, messageID, userID, level, message
 function formatLevelUpMessages(guildID, userID, page) {
   var pageSize = 10,
       output = "",
-      embed = new Discord.RichEmbed(),
+      embed = new Discord.MessageEmbed(),
       lvlupMsgs = util.xp.getLevelUpMessages(guildID, userID);
   var i = 0;
-  embed.setTitle(`Level-up History for ${client.users.get(userID) ? `${client.users.get(userID).username}` : userID}`);
+  embed.setTitle(`Level-up History for ${client.users.cache.get(userID) ? `${client.users.cache.get(userID).username}` : userID}`);
   for (var level in lvlupMsgs) {
     i++;
     if (i < (page-1)*pageSize+(page-1)) continue; // Page system
@@ -474,9 +474,9 @@ function getXPHistory(guildID, userID, page) {
       data = util.json.JSONFromFile(path),
       pageSize = 10,
       output = "",
-      embed = new Discord.RichEmbed();
-  embed.setAuthor(`${client.guilds.get(guildID).name}`, `${client.guilds.get(guildID).iconURL}`);
-  embed.setTitle(`XP History for ${client.users.get(userID).username}`);
+      embed = new Discord.MessageEmbed();
+  embed.setAuthor(`${client.guilds.cache.get(guildID).name}`, `${client.guilds.cache.get(guildID).iconURL()}`);
+  embed.setTitle(`XP History for ${client.users.cache.get(userID).username}`);
 
 
   if (data.xp.history == undefined) data.xp.history = {}; // if server doesn't have xp history yet, add it so js doesn't scream undefined
@@ -555,7 +555,7 @@ function getGlobalLeaderboard(page) {
       output   = "",
       path     = globalXPJson,
       data     = util.json.JSONFromFile(path),
-      embed    = new Discord.RichEmbed();
+      embed    = new Discord.MessageEmbed();
   // Sort by putting in array and using the sort() function
   var array = [];
   for (var user in data) {
@@ -571,16 +571,16 @@ function getGlobalLeaderboard(page) {
   for (var object in array) {
     if (isNaN(parseInt(array[object].id))) continue; // Handle non-users in xp object
     if (array[object].id == "672280373065154569") continue; // Skip bot user from leaderboard
-    if (client.users.get(array[object].id) !== undefined && client.users.get(array[object].id).bot) continue; // Skip user if they are a bot
+    if (client.users.cache.get(array[object].id) !== undefined && client.users.cache.get(array[object].id).bot) continue; // Skip user if they are a bot
     i++;
     if (i < (page-1)*pageSize+(page-1)) continue; // Page system
     if (i > page*pageSize) break;
-    var user = client.users.get(array[object].id);
+    var user = client.users.cache.get(array[object].id);
     if (user == undefined) user = { username: "Unknown", id: array[object].id }; // Replace username with "Unknown" since we don't know what their real username is
     var string = `${i}. <@${user.id}> - ${getXPGlobal(array[object].id, true)} xp, Level ${getLevelXP(array[object].xp)}\n`;
     if (i == 1) {
       output += `**${string}**`;
-      embed.setThumbnail(`${user.displayAvatarURL ? user.displayAvatarURL : ""}`);
+      embed.setThumbnail(`${user.displayAvatarURL() ? user.displayAvatarURL() : ""}`);
     } else output += string;
   }
   embed.setDescription(output);
@@ -604,7 +604,7 @@ function getGlobalLeaderboardRank(userID) {
   for (var object in array) {
     if (isNaN(parseInt(array[object].id))) continue; // Handle non-users in xp object
     if (array[object].id == "672280373065154569") continue; // Skip bot user from leaderboard
-    if (client.users.get(array[object].id) !== undefined && client.users.get(array[object].id).bot) continue; // Skip user if they are a bot
+    if (client.users.cache.get(array[object].id) !== undefined && client.users.cache.get(array[object].id).bot) continue; // Skip user if they are a bot
     i++;
     if (array[object].id !== userID) continue;
     return i;

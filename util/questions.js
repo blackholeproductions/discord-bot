@@ -55,11 +55,11 @@ module.exports = {
     if (data.questions == undefined) data.questions = {};
     if (data.questions.list == undefined) data.questions.list = [];
     var question = data.questions.list[index].question;
-    if (this.getAnswerChannel(guildID) == undefined || !client.guilds.get(guildID).channels.get(this.getAnswerChannel(guildID))) {
-      client.guilds.get(guildID).owner.user.send("You have not set your answer channel properly");
+    if (this.getAnswerChannel(guildID) == undefined || !client.guilds.cache.get(guildID).channels.cache.get(this.getAnswerChannel(guildID))) {
+      client.guilds.cache.get(guildID).owner.user.send("You have not set your answer channel properly");
       return;
     }
-    var channel = client.guilds.get(guildID).channels.get(this.getAnswerChannel(guildID));
+    var channel = client.guilds.cache.get(guildID).channels.cache.get(this.getAnswerChannel(guildID));
     this.removeQuestion(guildID, index);
     channel.send(`**${question}**\n${answer}`);
   },
@@ -69,7 +69,7 @@ module.exports = {
         i = 0,
         pageSize = 10,
         output = "",
-        embed = new Discord.RichEmbed();
+        embed = new Discord.MessageEmbed();
     if (data.questions == undefined) data.questions = {};
     if (data.questions.list == undefined) data.questions.list = []; // data.questions.list will be an array of objects
     for (var index in data.questions.list) {

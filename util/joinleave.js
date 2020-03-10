@@ -32,9 +32,9 @@ function setJoinLeaveChannel(guildID, channelID) {
 function getJoinLeaveChannel(guildID) {
   var path = util.json.getServerJSON(guildID),
       data = util.json.JSONFromFile(path);
-  if (client.guilds.get(guildID)) {
-    var defaultChannel = client.guilds.get(guildID).systemChannel
-    return client.guilds.get(guildID).channels.get(data.joinLeaveChannel) || defaultChannel;
+  if (client.guilds.cache.get(guildID)) {
+    var defaultChannel = client.guilds.cache.get(guildID).systemChannel
+    return client.guilds.cache.get(guildID).channels.cache.get(data.joinLeaveChannel) || defaultChannel;
   }
 }
 

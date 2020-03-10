@@ -90,7 +90,7 @@ function setCurrencySymbol(guild, symbol) {
 function topBalances(guild, page) {
   var path = util.json.getServerJSON(guild),
       data = util.json.JSONFromFile(path),
-      embed = new Discord.RichEmbed(),
+      embed = new Discord.MessageEmbed(),
       pageSize = 10,
       output = "";
   // Sort by putting in array and using the sort() function
@@ -102,21 +102,21 @@ function topBalances(guild, page) {
     return b.balance - a.balance;
   });
   embed.setColor("#ff8080");
-  embed.setAuthor(`${client.guilds.get(guild).name}`, `${client.guilds.get(guild).iconURL}`);
+  embed.setAuthor(`${client.guilds.cache.get(guild).name}`, `${client.guilds.cache.get(guild).iconURL()}`);
   embed.setTitle("Top Balances");
   var i = 0;
   for (var object in array) {
     if (array[object].id == "672280373065154569") continue; // Skip bot user from leaderboard
-    if (client.guilds.get(guild).members.get(array[object].id) !== undefined && client.guilds.get(guild).members.get(array[object].id).user.bot) continue; // Skip user if they are a bot
+    if (client.guilds.cache.get(guild).members.cache.get(array[object].id) !== undefined && client.guilds.cache.get(guild).members.get(array[object].id).user.bot) continue; // Skip user if they are a bot
     i++;
     if (i < (page-1)*pageSize+(page-1)) continue; // Page system
     if (i > page*pageSize) break;
-    var member = client.guilds.get(guild).members.get(array[object].id);
+    var member = client.guilds.cache.get(guild).members.cache.get(array[object].id);
     if (member == undefined) member = { user: { username: "Unknown", id: array[object].id} }; // Replace username with "Unknown" since we don't know what their real username is
     var string = `${i}. <@${member.user.id}> - ${get(guild, member.user.id)} ${getCurrencyName(guild)}${get(guild, member.user.id) !== 1 ? "s" : ""}\n`;
     if (i == 1) {
       output += `**${string}**`;
-      embed.setThumbnail(`${member.user.displayAvatarURL ? member.user.displayAvatarURL : ""}`);
+      embed.setThumbnail(`${member.user.displayAvatarURL() ? member.user.displayAvatarURL() : ""}`);
     } else output += string;
   }
   embed.setDescription(output);

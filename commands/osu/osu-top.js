@@ -10,7 +10,7 @@ const execute = (message, command) => {
   if (command.getArgs().length > 0) {
     var u = command.getArgs().join(" ");
     var output = "";
-    var embed = new Discord.RichEmbed();
+    var embed = new Discord.MessageEmbed();
     osuApi.getUserBest({ u: u }).then(scores => {
       osuApi.getUser({ u: u }).then(user => {
         embed.setTitle(`${user.name}'s Top Plays`)

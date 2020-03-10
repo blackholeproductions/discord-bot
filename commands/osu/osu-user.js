@@ -10,7 +10,7 @@ const execute = (message, command) => {
   if (command.getArgs().length > 0) {
     var u = command.getArgs().join(" ");
     osuApi.getUser({ u: u }).then(user => {
-      const embed = new Discord.RichEmbed()
+      const embed = new Discord.MessageEmbed()
         .setTitle(`${user.name}`)
         .setURL(`https://a.ppy.sh/${user.id}`)
         .setColor(0x00AE86)

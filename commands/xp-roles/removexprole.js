@@ -10,15 +10,15 @@ const execute = (message, command) => {
         message.channel.send("Unable to find role.");
         return;
       }
-      util.xp.removeRole(message.guild.id, role.id); // remove role
+      util.xp.roles.remove(message.guild.id, role.id); // remove role
     } else {
-      role = message.guild.roles.get(name); // if it's a number, get by ID
+      role = message.guild.roles.cache.get(name); // if it's a number, get by ID
       if (role == undefined) { // If role not found tell the user that they are dumb
         message.channel.send("Unable to find role. Assuming the role has been deleted and proceeding anyway.");
-        util.xp.removeRole(message.guild.id, name); // remove role
+        util.xp.roles.remove(message.guild.id, name); // remove role
         return;
       }
-      util.xp.removeRole(message.guild.id, role.id); // remove role
+      util.xp.roles.remove(message.guild.id, role.id); // remove role
     }
     message.channel.send(`Removed role`);
   } else {

@@ -3,7 +3,7 @@ const desc = "Add to to-do list",
 const execute = async (message, command) => {
   var argsString = command.getArgs().join(' '),
       item = util.removeAllBut(argsString, '"', 2), // remove apostrophes except for last 2
-      embed = new Discord.RichEmbed();
+      embed = new Discord.MessageEmbed();
   var project = item.split(`"`)[1];
   if (item.indexOf('"') !== -1) item = argsString.substring(0, item.indexOf('"')+util.countOccurences(argsString, '"')-2-1); // add countOccurences because the length shortened when the characters were item, and -1 to remove space at the end
   if (project == undefined || project == "") {

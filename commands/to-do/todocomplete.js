@@ -5,7 +5,7 @@ const desc = "Complete item in to-do list",
 const execute = async (message, command) => {
   var index = command.getArgs()[0],
       project = command.getArgs().join(' ').split('"')[1],
-      embed = new Discord.RichEmbed();
+      embed = new Discord.MessageEmbed();
   if (project == undefined || project == "") {
     project = "default";
   }

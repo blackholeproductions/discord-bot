@@ -1,17 +1,17 @@
 const desc = "Get XP of user",
       args = "<user>";
 const execute = (message, command) => {
-  var embed = new Discord.RichEmbed();
-  var user = message.mentions.users.first() || client.users.find("username", command.getArgs().join(" ")) || message.author;
+  var embed = new Discord.MessageEmbed();
+  var user = message.mentions.users.first() || client.users.cache.find(user => user.username ===  command.getArgs().join(" ")) || message.author;
   var xp = util.xp.getXP(user.id, message.guild.id);
   var xpString = util.xp.getXP(user.id, message.guild.id, true);
   var level = util.xp.getLevel(user.id, message.guild.id);
   var nextHighestRole = util.xp.getNextHighestRole(message.guild.id, level);
   var xpGained = util.xp.getXPGained(message.guild.id, user.id, Math.floor((new Date(Date.now()).getTime())/86400000));
   var xpAvg = util.xp.getXPGainedAvg(message.guild.id, user.id, 7);
-  embed.setAuthor(`${message.guild.name}`, `${message.guild.iconURL}`);
-  embed.setThumbnail(user.displayAvatarURL);
-  embed.setTitle(message.guild.members.get(user.id).nickname || user.username);
+  embed.setAuthor(`${message.guild.name}`, `${message.guild.iconURL()}`);
+  embed.setThumbnail(user.displayAvatarURL());
+  embed.setTitle(message.guild.members.cache.get(user.id).nickname || user.username);
 
   embed.setDescription(`*+${util.numberWithCommas(xpGained)} xp* gained today
 *+${util.numberWithCommas(xpAvg)} average xp* gained over last week

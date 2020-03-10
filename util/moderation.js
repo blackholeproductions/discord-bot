@@ -1,7 +1,7 @@
 const util = require(`${__basedir}/util/util.js`);
 var confirmations = {};
 function ban(guildID, userID, reason) {
-  var member = client.guilds.get(guildID).members.get(userID);
+  var member = client.guilds.cache.get(guildID).members.cache.get(userID);
   if (member == undefined) return 'Unable to find member';
   member.ban({ days: 7, reason: reason })
     .then(function(a) {
@@ -12,7 +12,7 @@ function ban(guildID, userID, reason) {
     });
 }
 function kick(guildID, userID, reason) {
-  var member = client.guilds.get(guildID).members.get(userID);
+  var member = client.guilds.cache.get(guildID).members.cache.get(userID);
   if (member == undefined) return 'Unable to find member';
   member.kick({ reason: reason })
     .then(function(a) {

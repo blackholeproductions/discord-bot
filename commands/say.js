@@ -7,7 +7,7 @@ const execute = (message, command) => {
     if (string.startsWith(config.prefix)) { message.channel.send("No"); return; }
     if (string.includes("@")) { message.channel.send("No"); return; }
     message.channel.send(string);
-    message.delete(1000);
+    message.delete({ timeout: 1000 });
   }
 }
 exports.desc = desc;

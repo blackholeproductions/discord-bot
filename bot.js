@@ -100,10 +100,10 @@ function execute(startmsg) {
   util.json.writeJSONToFile(timeJson, timeJsonPath);
 
   client.on('ready', () => {
-    var startMessage = `**${util.timestamp()}** Logged in as *${client.user.tag}*!\nI'm in ${client.guilds.size} servers with ${client.users.size} users in ${client.channels.size} channels serving ${util.cmdCount()} commands!\nStart message: ${startmsg}`;
-    client.guilds.get("587038554539032577").channels.get("612021603261480969").send(startMessage); // send message to bot-brain channel
+    var startMessage = `**${util.timestamp()}** Logged in as *${client.user.tag}*!\nI'm in ${client.guilds.cache.size} servers with ${client.users.cache.size} users in ${client.channels.cache.size} channels serving ${util.cmdCount()} commands!\nStart message: ${startmsg}`;
+    client.guilds.cache.get("587038554539032577").channels.cache.get("612021603261480969").send(startMessage); // send message to bot-brain channel
     // Check all servers the bot is in and see if they have a designated file. If they don't, make one.
-    client.guilds.array().forEach((item, i) => {
+    client.guilds.cache.array().forEach((item, i) => {
       var file = `${datapath}/server/${item.id}.json`;
       if (!fs.existsSync(file)) {
         var defaultJson = {
@@ -129,7 +129,7 @@ function execute(startmsg) {
     if (util.modules.isEnabled("counting", message.guild.id)) { // Handle counting module
       if (util.counting.isChannel(message.guild.id, message.channel.id)) {
         if (!util.counting.isValidCount(message.guild.id, message.content, message.author.id)) {
-          message.delete(1000); // Delete message if it is not valid
+          message.delete({ timeout: 1000 }); // Delete message if it is not valid
         } else {
           util.counting.count(message.guild.id, message.author.id); // Add to count if it is valid
           if (util.xp.isEnabled(message.guild.id)) {
@@ -217,7 +217,7 @@ function execute(startmsg) {
   });
 
   client.on('messageReactionAdd', (reaction, user) => {
-    if (reaction.users.has(client.user.id)) {
+    if (reaction.users.cache.has(client.user.id)) {
       util.pages.handlePages(reaction, user); // Handle reaction menu for pages
     }
   });

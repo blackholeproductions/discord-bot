@@ -4,7 +4,7 @@ const util = require(__basedir+"/util/util.js"),
       args = "<thing1> <thing2>";
 // Same as ratewaifu, but instead of one its two, and instead of a rating out of 10 its a percentage.
 const execute = (message, command) => {
-  var embed = new Discord.RichEmbed();
+  var embed = new Discord.MessageEmbed();
   var ship1 = command.getArgs()[0];
   var ship2 = command.getArgs()[1];
   if (command.getArgs().length != 2) {

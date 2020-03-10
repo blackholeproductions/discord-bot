@@ -5,7 +5,7 @@ module.exports = {
     if (command.getArgs().length > 0) {
       util.questions.addQuestion(message.guild.id, message.author.id, command.getArgs().join(' '));
       message.author.send(`Your question "${command.getArgs().join(' ')}" has been submitted.`);
-      message.delete(1000);
+      message.delete({ timeout: 1000 });
     } else {
       message.channel.send("You must specify a question to ask");
     }

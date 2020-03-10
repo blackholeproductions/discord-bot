@@ -68,9 +68,9 @@ function projectList(id, page) {
       pageSize = 10,
       i = 0,
       list = "",
-      embed = new Discord.RichEmbed();
+      embed = new Discord.MessageEmbed();
   if (data.todo == undefined) data.todo = {};
-  embed.setTitle(`${client.users.get(id).username}'s Project List`);
+  embed.setTitle(`${client.users.cache.get(id).username}'s Project List`);
   for (var project in data.todo) {
     i++;
     if (i < (page-1)*pageSize+(page-1)) continue; // Page system
@@ -136,7 +136,7 @@ function getList(id, page, project) {
       pageSize = 10,
       list = "",
       i = 0,
-      embed = new Discord.RichEmbed();
+      embed = new Discord.MessageEmbed();
   if (data.todo == undefined) data.todo = {};
   if (data.todo[project] == undefined) {
     return "Invalid project";

@@ -178,7 +178,7 @@ function getHelpMenu(guildID, userID, page, helpType) {
       cmdlist    = { servercmds: {} },                                                 // list of commands and their descriptions
       length     = 0,                                                                  // length of cmdlist
       pageSize   = 10,                                                                 // size of each page
-      embed      = new Discord.RichEmbed();                                            // embed to return
+      embed      = new Discord.MessageEmbed();                                            // embed to return
   var genCmdObj = function(desc, category) {
     var obj = {
       description: desc,
@@ -259,9 +259,11 @@ ${aliases.length > 0 ? `\n*Aliases: ${aliases}*` : ""}\n`;
 
   for (var command in nonCategoryCmds) {
     var aliases = [];
-    for (var alias in command.aliases) {
-      if (command.aliases[alias] !== command) {
-        aliases.push(command.aliases[alias])
+    console.log(nonCategoryCmds[command].aliases);
+    var cmdaliases = nonCategoryCmds[command].aliases;
+    for (var alias in cmdaliases) {
+      if (cmdaliases[alias] !== command) {
+        aliases.push(cmdaliases[alias]);
       }
     }
     embed.addField(`${prefix}${command} ${commands[command].args}`, `${commands[command].desc}\
@@ -288,7 +290,7 @@ function getDevlog(page, day) {
       output     = "",
       days       = {},
       pageSize   = 10,
-      embed = new Discord.RichEmbed();
+      embed = new Discord.MessageEmbed();
   for (var time in devlog) {
     var date = new Date(parseInt(time));
     var today = Math.floor((date.getTime()-date.getTimezoneOffset()*60000)/86400000); // Get number of days since epoch (timezone stuff cus it was off by that many hours)

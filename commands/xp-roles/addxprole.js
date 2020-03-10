@@ -12,7 +12,7 @@ const execute = (message, command) => {
     if (isNaN(parseInt(name))) {
       role = message.guild.roles.find("name", name); // if it's a string, get by name
     } else {
-      role = message.guild.roles.get(name); // if it's a number, get by ID
+      role = message.guild.roles.cache.get(name); // if it's a number, get by ID
     }
     if (role == undefined) { // If role not found tell the user that they are dumb
       message.channel.send("Unable to find role.");

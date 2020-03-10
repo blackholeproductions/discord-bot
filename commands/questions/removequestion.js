@@ -1,5 +1,5 @@
 module.exports = {
-  desc: "Answer a question",
+  desc: "Remove a question",
   args: "<index>",
   permission: "MANAGE_GUILD",
   execute(message, command) {
@@ -9,12 +9,11 @@ module.exports = {
       message.author.send(`${index} is not a valid index`);
       return;
     }
-    if (command.getArgs().length > 1) {
-      util.questions.postAnswer(message.guild.id, index, answer);
-      message.author.send(`Posted answer in answer channel`);
-      message.delete({ timeout: 1000 });
+    if (command.getArgs().length > 0) {
+      util.questions.removeQuestion(message.guild.id, index);
+      message.author.send(`Removed question at index ${index}`);
     } else {
-      message.channel.send("You must specify an index and a response.");
+      message.channel.send("You must specify an index to ask");
     }
   }
 }

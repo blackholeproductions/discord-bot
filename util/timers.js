@@ -72,7 +72,7 @@ function cancelReminder(userID, date) {
   delete activeReminders[userID][date];
 }
 function remind(userID, date) {
-  var user = client.users.get(userID);
+  var user = client.users.cache.get(userID);
   if (!user) return;
   user.send(`${activeReminders[userID][date]}`);
   cancelReminder(userID, date);

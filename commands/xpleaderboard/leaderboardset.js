@@ -8,7 +8,7 @@ const execute = (message, command) => {
     message.channel.send("You have specified an invalid number of arguments");
     return;
   } else {
-    client.guilds.get(message.guild.id).channels.get(channelid).fetchMessage(messageid)
+    client.guilds.cache.get(message.guild.id).channels.cache.get(channelid).messages.fetch(messageid)
       .then(msg => util.xp.setLeaderboardMessage(msg.guild.id, msg.channel.id, msg.id))
       .catch(`Error setting leaderboard in ${message.guild.id}`);
   }

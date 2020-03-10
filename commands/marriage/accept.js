@@ -1,7 +1,7 @@
 const desc = "Accept a marriage request from a user",
       args = "<user>";
 const execute = (message, command) => {
-  var user = message.mentions.users.first() || client.users.find("username", command.getArgs().join(" "));
+  var user = message.mentions.users.first() || client.users.cache.find(user => user.username ===  command.getArgs().join(" "));
   if (!user) {
     message.channel.send("You have specified an invalid user.");
     return;
