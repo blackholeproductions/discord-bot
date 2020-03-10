@@ -34,42 +34,53 @@ module.exports = {
     data.questions.list.push({ question: question, user: userID, date: new Date(Date.now()) });
     util.json.writeJSONToFile(data, path);
   },
-  removeQuestion(guildID, question) {
+  removeQuestion(guildID, index) {
     var path = util.json.getServerJSON(guildID);
     var data = util.json.JSONFromFile(path);
     if (data.questions == undefined) data.questions = {};
     if (data.questions.list == undefined) data.questions.list = []; // data.questions.list will be an array of objects
-    for (var index in data.questions.list) {
-      if (data.questions.list[index].question == question) {
-        data.questions.list.splice(index, 1);
-        break;
-      }
-    }
+    data.questions.list.splice(index, 1);
     util.json.writeJSONToFile(data, path);
   },
-  postAnswer(guildID, question, answer) {
-    var channel = client.guilds.get(guildID).channels.get(getAnswerChannel(guildID));
-    if (getAnswerChannel(guildID) == undefined || !channel) {
+  isQuestionValid(guildID, index) {
+    var path = util.json.getServerJSON(guildID);
+    var data = util.json.JSONFromFile(path);
+    var question = data.questions.list[index-1];
+    return question !== undefined;
+  },
+  postAnswer(guildID, index, answer) {
+    index -= 1;
+    var path = util.json.getServerJSON(guildID);
+    var data = util.json.JSONFromFile(path);
+    if (data.questions == undefined) data.questions = {};
+    if (data.questions.list == undefined) data.questions.list = [];
+    var question = data.questions.list[index].question;
+    if (this.getAnswerChannel(guildID) == undefined || !client.guilds.get(guildID).channels.get(this.getAnswerChannel(guildID))) {
       client.guilds.get(guildID).owner.user.send("You have not set your answer channel properly");
       return;
     }
-    removeQuestion(question);
+    var channel = client.guilds.get(guildID).channels.get(this.getAnswerChannel(guildID));
+    this.removeQuestion(guildID, index);
     channel.send(`**${question}**\n${answer}`);
   },
-  listQuestions(guildID) {
+  listQuestions(guildID, page) {
     var path = util.json.getServerJSON(guildID),
         data = util.json.JSONFromFile(path),
         i = 0,
-        output = "";
+        pageSize = 10,
+        output = "",
+        embed = new Discord.RichEmbed();
     if (data.questions == undefined) data.questions = {};
     if (data.questions.list == undefined) data.questions.list = []; // data.questions.list will be an array of objects
     for (var index in data.questions.list) {
       i++;
       if (i < (page-1)*pageSize+(page-1)) continue; // Page system
       if (i > page*pageSize) break;
-      output += `[${index}] ${data.questions.list[index].question}`;
+      output += `[${parseInt(index)+1}] ${data.questions.list[index].question}`;
     }
-    data.questions.list.push({ question: question, user: userID, date: new Date(Date.now()) });
-    util.json.writeJSONToFile(data, path);
+    if (output == "") output = "No questions found";
+    embed.setDescription(output);
+    embed.setFooter(`Page ${page}`);
+    return embed;
   }
 };

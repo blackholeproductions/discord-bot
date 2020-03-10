@@ -68,6 +68,9 @@ function updateMessage(messageID, type, page) {
     case "global-leaderboard":
       message.edit(util.xp.getGlobalLeaderboard(page));
       break;
+    case "questionsList":
+      message.edit(util.questions.listQuestions(message.guild.id, page));
+      break;
     default:
       message.edit(`something has gone horribly wrong.\n\`\`\`${messages[reaction.message.id]}\`\`\``);
       break;

@@ -11,6 +11,7 @@ const md5        = require('md5'),
       timers     = require('./timers.js'),
       moderation = require('./moderation.js'),
       joinleave  = require('./joinleave.js'),
+      questions  = require('./questions.js'),
       readline   = require('readline');
 /*
 ** seededRand()
@@ -426,6 +427,7 @@ function getCommandFromAlias(alias) {
   }
 }
 
+exports.questions = questions;
 exports.getCommandFromAlias = getCommandFromAlias;
 exports.joinleave = joinleave;
 exports.moderation = moderation;
