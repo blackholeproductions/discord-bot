@@ -170,7 +170,7 @@ function generateRandomNumber(min, max) {
 ** getHelpMenu(guildID, page, helpType)
 ** Description: return the help menu for a user
 */
-function getHelpMenu(guildID, userID, page, helpType) {
+function getHelpMenu(guildID, userID, page, helpType, mod) {
   var server     = helpType == "server" || helpType == "all" || helpType == undefined, // whether we want server commands or not
       bot        = helpType == "bot" || helpType == "all" || helpType == undefined,    // whether we want bot commands or not
       servercmds = util.json.JSONFromFile(util.json.getServerJSON(guildID)).commands,  // list of server commands
@@ -186,6 +186,7 @@ function getHelpMenu(guildID, userID, page, helpType) {
     }
     return obj;
   }
+  console.log(`${mod}`);
   if (bot) {
     // Construct a list of all of the commands with their descriptions
     for (var cmd in commands) {
@@ -223,14 +224,10 @@ function getHelpMenu(guildID, userID, page, helpType) {
 
   embed.setTitle(`Help Menu${helpType ? ` (${helpType})` : ""} - Page ${page}/${Math.floor(length/pageSize)+1}`);
 
-  var iteration = 0;
   var categories = {};
   var nonCategoryCmds = {};
   for (var command in cmdlist) {
-    if (iteration > page*pageSize-1) break; // no need to continue the loop after we've printed all we need to.
     if (command == "servercmds") continue;  // skip over servercmds object as this contains the servercmds and isn't a command per se
-    iteration++;
-    if (iteration < (page-1)*pageSize+1) continue; // skip over if the beginning of the selected page has not been reached
     if (cmdlist[command].category !== "") {
       if (categories[`${cmdlist[command].category}`] == undefined) categories[`${cmdlist[command].category}`] = {}; // if it doesnt exist create it cus nested objects are cancer
       categories[`${cmdlist[command].category}`][command] = cmdlist[command];
@@ -240,9 +237,14 @@ function getHelpMenu(guildID, userID, page, helpType) {
   }
   if (Object.keys(categories).length != 0 || Object.keys(nonCategoryCmds).length != 0) embed.addField("**Bot Commands**", "**All commands enabled by default, or from any modules you have enabled**");
   // loop through all commands with category and construct the string to be prefixed
+  var iteration = 0;
   for (var category in categories) {
     var categoryBody = "";
     for (var command in categories[category]) {
+      if (mod !== "" && mod !== category) continue;
+      if (iteration > page*pageSize-1) break; // no need to continue the loop after we've printed all we need to.
+      iteration++;
+      if (iteration < (page-1)*pageSize+1) continue; // skip over if the beginning of the selected page has not been reached
       var cmd = commands[command] || modulecmds[command];
       var aliases = [];
       for (var alias in cmd.aliases) {
@@ -254,13 +256,15 @@ function getHelpMenu(guildID, userID, page, helpType) {
 ${cmd.ex !== "" ? `\nExample: *${prefix}${cmd.ex}*` : ""}\
 ${aliases.length > 0 ? `\n*Aliases: ${aliases}*` : ""}\n`;
     }
-    embed.addField(`**${category} commands**`, `${categoryBody}`);
+    if (categoryBody !== "") embed.addField(`**${category} commands**`, `${categoryBody}`);
   }
-
+  if (mod !== "") return embed;
   for (var command in nonCategoryCmds) {
+    if (iteration > page*pageSize-1) break; // no need to continue the loop after we've printed all we need to.
+    iteration++;
+    if (iteration < (page-1)*pageSize+1) continue; // skip over if the beginning of the selected page has not been reached
     var aliases = [];
-    console.log(nonCategoryCmds[command].aliases);
-    var cmdaliases = nonCategoryCmds[command].aliases;
+    var cmdaliases = commands[command].aliases;
     for (var alias in cmdaliases) {
       if (cmdaliases[alias] !== command) {
         aliases.push(cmdaliases[alias]);

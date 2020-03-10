@@ -66,7 +66,7 @@ const disableUser = (mod, id) => {
 ** property(mod, id, property)
 ** Description: gets a property of a module
 */
-const property = (mod, property) => {
+const property = (mod, property, id) => {
   var selectedmodule;
   if (modules[mod] !== undefined && modules[mod][property] !== undefined) {
     selectedmodule = modules[mod];

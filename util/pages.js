@@ -48,7 +48,7 @@ function updateMessage(messageID, type, page) {
       message.edit(util.getDevlog(page, messages[messageID].day));
       break;
     case "help":
-      message.edit(util.getHelpMenu(message.guild.id, message.author.id, page, messages[messageID].helpType));
+      message.edit(util.getHelpMenu(message.guild.id, message.author.id, page, messages[messageID].helpType, messages[messageID].mod));
       break;
     case "levelUpMessages":
       message.edit(util.xp.formatLevelUpMessages(message.guild.id, messages[messageID].user.id, page));
