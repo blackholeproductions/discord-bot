@@ -125,6 +125,7 @@ function execute(startmsg) {
 
   client.on('message', message => {
     if (message.guild == null) return;
+    // COUNTING
     if (util.modules.isEnabled("counting", message.guild.id)) { // Handle counting module
       if (util.counting.isChannel(message.guild.id, message.channel.id)) {
         if (!util.counting.isValidCount(message.guild.id, message.content, message.author.id)) {
@@ -138,7 +139,7 @@ function execute(startmsg) {
         return;
       }
     }
-
+    // XP
     if (util.xp.isEnabled(message.guild.id)) { // Handle xp module
       if (util.xp.enabledXPGain(message.guild.id, message.channel.id)) { // If xp is enabled in channel
         var levelBefore = util.xp.getLevel(message.author.id, message.guild.id);
@@ -150,6 +151,7 @@ function execute(startmsg) {
         }
       }
     }
+    // MODERATION
     if (util.modules.isEnabled("moderation", message.guild.id) && util.moderation.hasConfirmation(message.guild.id, message.author.id)) {
       if (message.content == "y") {
         util.moderation.confirm(message.guild.id, message.author.id);
@@ -159,12 +161,17 @@ function execute(startmsg) {
         message.channel.send("Removed action")
       }
     }
+
+    // GLOBAL XP
     if (util.modules.isEnabledUser("global-xp")) {
       if (util.xp.enabledXPGain(message.guild.id, message.channel.id)) util.xp.addXPGlobal(message.author.id, message.guild.id);
     }
+
+    // CURRENCY
     if (util.modules.isEnabled("currency", message.guild.id)) { // Handle currency module
       util.currency.add(message.guild.id, message.author.id, 1);
     }
+
     var prefix = util.getServerPrefix(message.guild.id); // get server prefix
     console.log(`${util.timestamp()} ${message.author.tag} (${message.channel.name}): ${message.content}`); // log message
     // Check if message contains prefix (with the exception of the u!setprefix command)
@@ -183,8 +190,12 @@ function execute(startmsg) {
         if (selectedCommand.module != undefined) { // check if command is a module command
           if (util.modules.isEnabled(selectedCommand.module, message.guild.id) || util.modules.isEnabledUser(selectedCommand.module, message.author.id)) { // Check if valid for server or user
             if (!selectedCommand.admin || message.author.id == "218525899535024129") {
-              command.set(message); // same as above
-              selectedCommand.execute(message, command);
+              if (selectedCommand.permission == undefined || message.member.hasPermission(selectedCommand.permission)) {
+                command.set(message); // same as above
+                selectedCommand.execute(message, command);
+              } else {
+                message.channel.send(`You don't have permission to execute that command. (Need ${selectedCommand.permission} permission)`);
+              }
             }
           }
         } else { // Command is normal command

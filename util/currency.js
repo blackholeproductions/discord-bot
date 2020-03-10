@@ -88,11 +88,11 @@ function setCurrencySymbol(guild, symbol) {
 ** Description: gets top balances of server
 */
 function topBalances(guild, page) {
-  var path = util.json.getServerJSON(guild);
-  var data = util.json.JSONFromFile(path);
-  var embed = new Discord.RichEmbed();
-  var pageSize = 10;
-  var output = "";
+  var path = util.json.getServerJSON(guild),
+      data = util.json.JSONFromFile(path),
+      embed = new Discord.RichEmbed(),
+      pageSize = 10,
+      output = "";
   // Sort by putting in array and using the sort() function
   var array = [];
   for (var user in data.currency.users) {

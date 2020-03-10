@@ -55,5 +55,21 @@ module.exports = {
     }
     removeQuestion(question);
     channel.send(`**${question}**\n${answer}`);
+  },
+  listQuestions(guildID) {
+    var path = util.json.getServerJSON(guildID),
+        data = util.json.JSONFromFile(path),
+        i = 0,
+        output = "";
+    if (data.questions == undefined) data.questions = {};
+    if (data.questions.list == undefined) data.questions.list = []; // data.questions.list will be an array of objects
+    for (var index in data.questions.list) {
+      i++;
+      if (i < (page-1)*pageSize+(page-1)) continue; // Page system
+      if (i > page*pageSize) break;
+      output += `[${index}] ${data.questions.list[index].question}`;
+    }
+    data.questions.list.push({ question: question, user: userID, date: new Date(Date.now()) });
+    util.json.writeJSONToFile(data, path);
   }
 };

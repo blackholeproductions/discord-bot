@@ -33,6 +33,7 @@ function isValidCount(guildID, count, userID) {
   if (data.counting.count == undefined) data.counting.count = 0;
   if (count.includes(" ")) return false;
   if (isNaN(count)) return false;
+  if (count.includes('.')) return false;
   if (parseInt(count) == data.counting.count+1 && userID !== data.counting.user) return true;
   return false;
 }
