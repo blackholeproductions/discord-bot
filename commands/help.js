@@ -19,7 +19,8 @@ module.exports = {
     if (isNaN(page)) page = 1;
     if (page <= 0) page = 1;
 
-    const m = await message.channel.send(util.getHelpMenu(message.guild.id, message.author.id, page, helpType, mod));
-    util.pages.addPageMessage(m.id, m.channel.id, message.author.id, page, "help", { helpType: helpType, mod: mod });
+    const m = await message.author.send(util.getHelpMenu(message.guild.id, message.author.id, page, helpType, mod));
+    util.pages.addPageMessage(m.id, m.channel.id, message.author.id, page, "help", { helpType: helpType, mod: mod, guild: message.guild.id });
+    message.react(client.guilds.cache.get(config.mainServerID).emojis.cache.get("685345301116223521")).catch(console.error);
   }
 }

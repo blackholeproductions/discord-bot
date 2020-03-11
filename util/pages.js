@@ -48,7 +48,7 @@ function updateMessage(messageID, type, page) {
       message.edit(util.getDevlog(page, messages[messageID].day));
       break;
     case "help":
-      message.edit(util.getHelpMenu(message.guild.id, message.author.id, page, messages[messageID].helpType, messages[messageID].mod));
+      message.edit(util.getHelpMenu(messages[messageID].guild, message.author.id, page, messages[messageID].helpType, messages[messageID].mod));
       break;
     case "levelUpMessages":
       message.edit(util.xp.formatLevelUpMessages(message.guild.id, messages[messageID].user.id, page));
@@ -64,6 +64,9 @@ function updateMessage(messageID, type, page) {
       break;
     case "baltop":
       message.edit(util.currency.topBalances(message.guild.id, page));
+      break;
+    case "gbaltop":
+      message.edit(util.currency.topGlobalBalances(page));
       break;
     case "global-leaderboard":
       message.edit(util.xp.getGlobalLeaderboard(page));

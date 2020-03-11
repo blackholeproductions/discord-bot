@@ -116,7 +116,7 @@ function execute(startmsg) {
         util.json.writeJSONToFile(defaultJson, file);
       }
     });
-    // Start XP cooldowns
+    // functions to run on startup
     util.xp.startXPCooldowns();
     util.currency.startCooldowns();
     util.incrementVersion();
@@ -162,7 +162,7 @@ function execute(startmsg) {
     }
 
     // GLOBAL XP
-    if (util.modules.isEnabledUser("global-xp")) {
+    if (util.modules.isEnabledUser("global-xp", message.author.id)) {
       if (util.xp.enabledXPGain(message.guild.id, message.channel.id)) util.xp.addXPGlobal(message.author.id, message.guild.id);
     }
 
@@ -171,6 +171,11 @@ function execute(startmsg) {
       util.currency.add(message.guild.id, message.author.id, 1);
     }
 
+    // GLOBAL CURRENCY
+    if (util.modules.isEnabledUser("global-currency", message.author.id)) {
+      console.log("a")
+      if (util.xp.enabledXPGain(message.guild.id, message.channel.id)) util.currency.addGlobal(message.guild.id, message.author.id, 1);
+    }
     var prefix = util.getServerPrefix(message.guild.id); // get server prefix
     console.log(`${util.timestamp()} ${message.author.tag} (${message.channel.name}): ${message.content}`); // log message
     // Check if message contains prefix (with the exception of the u!setprefix command)
