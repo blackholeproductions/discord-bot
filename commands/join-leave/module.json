@@ -1,4 +1,4 @@
 {
   "description": "Add join/leave messages to your discord server",
-  "tutorial": "In progress"
+  "tutorial": "To begin, run the -setjoinleavechannel command in the channel that you wish to set as the channel where join/leave messages will be sent. If none is specified, then the system channel will be used.\nWhen setting the join/leave messages with their respective commands, viewable with `${serverprefix}help join-leave`, there are 2 placeholders that you can use. <user> gets the username of a user, and <server> gets the name of your server. Ex: -joinmessage <user> joined <server>! Welcome!"
 }

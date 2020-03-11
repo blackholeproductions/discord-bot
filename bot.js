@@ -123,17 +123,16 @@ function execute(startmsg) {
     util.timers.startTimers();
   });
 
-  client.on('message', message => {
+  client.on('message', async message => {
     if (message.guild == null) return;
     // COUNTING
     if (util.modules.isEnabled("counting", message.guild.id)) { // Handle counting module
       if (util.counting.isChannel(message.guild.id, message.channel.id)) {
-        if (!util.counting.isValidCount(message.guild.id, message.content, message.author.id)) {
+        if (!await util.counting.isValidCount(message.guild.id, message.content, message.author.id)) {
           message.delete({ timeout: 1000 }); // Delete message if it is not valid
         } else {
-          util.counting.count(message.guild.id, message.author.id); // Add to count if it is valid
           if (util.xp.isEnabled(message.guild.id)) {
-            util.xp.addXP(message.author.id, message.guild.id, 5); // Add 5 xp for counting
+            util.xp.addXP(message.author.id, message.guild.id, util.xp.getLevel(message.author.id, message.guild.id)); // Add 5 xp for counting
           }
         }
         return;

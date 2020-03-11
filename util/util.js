@@ -178,7 +178,7 @@ function getHelpMenu(guildID, userID, page, helpType, mod) {
       cmdlist    = { servercmds: {} },                                                 // list of commands and their descriptions
       length     = 0,                                                                  // length of cmdlist
       pageSize   = 10,                                                                 // size of each page
-      embed      = new Discord.MessageEmbed();                                            // embed to return
+      embed      = new Discord.MessageEmbed();                                         // embed to return
   var genCmdObj = function(desc, category) {
     var obj = {
       description: desc,
@@ -197,7 +197,7 @@ function getHelpMenu(guildID, userID, page, helpType, mod) {
         category = '';
       }
       cmdlist[cmd] = genCmdObj(commands[cmd].desc, category);
-      length++;
+      if (mod == "") length++;
     }
     // Do the same for module commands.
     for (var cmd in modulecmds) {
@@ -209,7 +209,7 @@ function getHelpMenu(guildID, userID, page, helpType, mod) {
       }
       if (util.modules.isEnabled(modulecmds[cmd].module, guildID) || util.modules.isEnabledUser(modulecmds[cmd].module, userID)) {
         cmdlist[cmd] = genCmdObj(modulecmds[cmd].desc, category);
-        length++;
+        if (mod == "" || mod == modulecmds[cmd].module) length++;
       }
     }
   }
@@ -218,7 +218,7 @@ function getHelpMenu(guildID, userID, page, helpType, mod) {
     for (var command in servercmds) {
       cmdlist.servercmds[command] = servercmds.descriptions[command];
       if (cmdlist.servercmds[command] == undefined) cmdlist.servercmds[command] = "No description provided";
-      length++;
+      if (mod == "") length++;
     }
   }
 
@@ -235,7 +235,6 @@ function getHelpMenu(guildID, userID, page, helpType, mod) {
       nonCategoryCmds[command] = cmdlist[command];
     }
   }
-  if (Object.keys(categories).length != 0 || Object.keys(nonCategoryCmds).length != 0) embed.addField("**Bot Commands**", "**All commands enabled by default, or from any modules you have enabled**");
   // loop through all commands with category and construct the string to be prefixed
   var iteration = 0;
   for (var category in categories) {
@@ -252,13 +251,14 @@ function getHelpMenu(guildID, userID, page, helpType, mod) {
           aliases.push(cmd.aliases[alias])
         }
       }
+      if (embed.fields.length == 0) embed.addField("**Bot Commands**", "**All commands enabled by default, or from any modules you have enabled**");
       categoryBody += `${prefix}${command} ${cmd.args} - ${cmd.desc}\
 ${cmd.ex !== "" ? `\nExample: *${prefix}${cmd.ex}*` : ""}\
 ${aliases.length > 0 ? `\n*Aliases: ${aliases}*` : ""}\n`;
     }
     if (categoryBody !== "") embed.addField(`**${category} commands**`, `${categoryBody}`);
   }
-  if (mod !== "") return embed;
+  if (mod !== "") return embed; // if module is specified, return because we dont need to get anything else
   for (var command in nonCategoryCmds) {
     if (iteration > page*pageSize-1) break; // no need to continue the loop after we've printed all we need to.
     iteration++;
@@ -270,6 +270,7 @@ ${aliases.length > 0 ? `\n*Aliases: ${aliases}*` : ""}\n`;
         aliases.push(cmdaliases[alias]);
       }
     }
+    if (embed.fields.length == 0) embed.addField("**Bot Commands**", "**All commands enabled by default, or from any modules you have enabled**");
     embed.addField(`${prefix}${command} ${commands[command].args}`, `${commands[command].desc}\
 ${commands[command].ex !== "" ? `\nExample: *${prefix}${commands[command].ex}*` : ""}\
 ${aliases.length > 0 ? `\n*Aliases: ${aliases}*` : ""}`);

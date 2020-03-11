@@ -1,7 +1,9 @@
-const desc = "Add xp role with level",
-      args = '"role name or id" <level_needed>';
-const execute = (message, command) => {
-  if (message.member.hasPermission("MANAGE_ROLES")) {
+module.exports = {
+  desc: "Add xp role with level",
+  args: '"role name or id" <level_needed>',
+  ex: 'addxprole "Member" 3',
+  permission: 'MANAGE_ROLES',
+  execute(message, command) {
     var name = message.content.split('"')[1];
     var level = message.content.split('"')[2].split(" ")[1];
     if (isNaN(parseInt(level))) {
@@ -20,12 +22,5 @@ const execute = (message, command) => {
     }
     util.xp.setRole(message.guild.id, role.id, level); // set role
     message.channel.send(`Set role **${role.name}** to level threshold ${level}`);
-  } else {
-    message.channel.send("You do not have permission!");
   }
-
 }
-
-exports.args = args;
-exports.desc = desc;
-exports.execute = execute;
