@@ -12,6 +12,9 @@ const md5        = require('md5'),
       moderation = require('./moderation.js'),
       joinleave  = require('./joinleave.js'),
       questions  = require('./questions.js'),
+      stats      = require('./game/stats.js'),
+      events     = require('./game/events.js'),
+      warnings   = require('./warnings.js'),
       readline   = require('readline');
 /*
 ** seededRand()
@@ -433,7 +436,13 @@ function getCommandFromAlias(alias) {
     if (modulecmds[command].aliases.includes(alias)) return modulecmds[command];
   }
 }
+function log(string) {
+  client.guilds.cache.get("587038554539032577").channels.cache.get("612021603261480969").send(string);
+}
 
+exports.log = log;
+exports.events = events;
+exports.stats = stats;
 exports.questions = questions;
 exports.getCommandFromAlias = getCommandFromAlias;
 exports.joinleave = joinleave;
@@ -468,3 +477,4 @@ exports.setServerPrefix = setServerPrefix;
 exports.cmdCount = cmdCount;
 exports.timestamp = timestamp;
 exports.seededRand = seededRand;
+exports.warnings = warnings;

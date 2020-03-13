@@ -372,6 +372,7 @@ function getNextHighestRole(guildID, level) {
   var path = util.json.getServerJSON(guildID),
       data = util.json.JSONFromFile(path),
       output = "`No role`";
+  if (data.xp == undefined) data.xp = {};
   if (data.xp.roles == undefined) data.xp.roles = {}; // Add roles object if it doesn't already exist
   for (var role in data.xp.roles) {
     if (level < data.xp.roles[role]) {
@@ -405,6 +406,7 @@ function getMinimumXPForRole(guildID, roleID) {
   var path = util.json.getServerJSON(guildID),
       data = util.json.JSONFromFile(path),
       output = 0;
+  if (data.xp == undefined) data.xp = {};
   if (data.xp.roles == undefined) data.xp.roles = {}; // Add roles object if it doesn't already exist
   for (var role in data.xp.roles) {
     if (roleID == role) {
@@ -420,6 +422,7 @@ function getMinimumXPForRole(guildID, roleID) {
 function getLevelUpMessages(guildID, userID) {
   var path = util.json.getServerJSON(guildID),
       data = util.json.JSONFromFile(path);
+  if (data.xp == undefined) data.xp = {};
   if (data.xp.levelUpMessages == undefined) data.xp.levelUpMessages = {}; // Add roles object if it doesn't already exist
   if (data.xp.levelUpMessages[userID] == undefined) data.xp.levelUpMessages[userID] = {}; // Add roles object if it doesn't already exist
   return data.xp.levelUpMessages[userID];
@@ -431,6 +434,7 @@ function getLevelUpMessages(guildID, userID) {
 function addLevelUpMessage(guildID, channelID, messageID, userID, level, message) {
   var path = util.json.getServerJSON(guildID),
       data = util.json.JSONFromFile(path);
+  if (data.xp == undefined) data.xp = {};
   if (data.xp.levelUpMessages == undefined) data.xp.levelUpMessages = {}; // Add roles object if it doesn't already exist
   if (data.xp.levelUpMessages[userID] == undefined) data.xp.levelUpMessages[userID] = {}; // Add roles object if it doesn't already exist
   if (data.xp.levelUpMessages[userID][level] == undefined) data.xp.levelUpMessages[userID][level] = {}
@@ -477,8 +481,7 @@ function getXPHistory(guildID, userID, page) {
       embed = new Discord.MessageEmbed();
   embed.setAuthor(`${client.guilds.cache.get(guildID).name}`, `${client.guilds.cache.get(guildID).iconURL()}`);
   embed.setTitle(`XP History for ${client.users.cache.get(userID).username}`);
-
-
+  if (data.xp == undefined) data.xp = {};
   if (data.xp.history == undefined) data.xp.history = {}; // if server doesn't have xp history yet, add it so js doesn't scream undefined
   var i = 0;
   for (var day in data.xp.history) {
@@ -506,6 +509,7 @@ function getDayRank(guildID, userID, day) {
 function getXPGained(guildID, userID, day) {
   var path = util.json.getServerJSON(guildID),
       data = util.json.JSONFromFile(path);
+  if (data.xp == undefined) data.xp = {};
   if (data.xp.history == undefined) data.xp.history = {}; // if server doesn't have xp history yet, add it so js doesn't scream undefined
   var xpBefore = 0;
   for (var i = 1; i < day-18298; i++) {

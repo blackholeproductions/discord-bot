@@ -116,15 +116,20 @@ function execute(startmsg) {
         util.json.writeJSONToFile(defaultJson, file);
       }
     });
+    client.user.setPresence({ activity: { name: 'u!help' } })
+      .then(console.log)
+      .catch(console.error);
     // functions to run on startup
     util.xp.startXPCooldowns();
     util.currency.startCooldowns();
     util.incrementVersion();
     util.timers.startTimers();
+    util.events.tick();
   });
 
   client.on('message', async message => {
     if (message.guild == null) return;
+    console.log(`${util.timestamp()} ${message.author.tag} (${message.guild.name} - #${message.channel.name}): ${message.content}`); // log message
     // COUNTING
     if (util.modules.isEnabled("counting", message.guild.id)) { // Handle counting module
       if (util.counting.isChannel(message.guild.id, message.channel.id)) {
@@ -173,11 +178,9 @@ function execute(startmsg) {
 
     // GLOBAL CURRENCY
     if (util.modules.isEnabledUser("global-currency", message.author.id)) {
-      console.log("a")
       if (util.xp.enabledXPGain(message.guild.id, message.channel.id)) util.currency.addGlobal(message.guild.id, message.author.id, 1);
     }
     var prefix = util.getServerPrefix(message.guild.id); // get server prefix
-    console.log(`${util.timestamp()} ${message.author.tag} (${message.channel.name}): ${message.content}`); // log message
     // Check if message contains prefix (with the exception of the u!setprefix command)
     if (message.content.startsWith(config.prefix)) { // Check for u!setprefix
       var cmdName = message.content.split(config.prefix)[1].split(" ")[0];
@@ -242,6 +245,22 @@ function execute(startmsg) {
       channel.send(util.joinleave.getLeaveMessage(member.guild.id).replace(/<user>/g, member.user.username).replace(/<server>/g, member.guild.name));
     }
   });
+  // Create json for new guilds
+  client.on('guildAdd', guild => {
+    client.guilds.cache.get("587038554539032577").channels.cache.get("612021603261480969").send(`I've been added to **${guild.name}**!`);
+    var file = `${datapath}/server/${guild.id}.json`;
+    if (!fs.existsSync(file)) {
+      var defaultJson = {
+        prefix: config.prefix,
+        commands: {
+          descriptions: {}
+        },
+        modules: {}
+      }
+      util.json.writeJSONToFile(defaultJson, file);
+    }
+  });
+
   client.login(config.token);
 }
 exports.execute = execute;

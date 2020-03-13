@@ -1,3 +1,4 @@
 {
-  "description": "Provides an automatic leaderboard for the xp module"
+  "description": "Provides an automatic leaderboard for the xp module",
+  "tutorial": "Create a new channel that only Uni has the Send Messages permission in, and then run the -leaderboardsend command and follow the instruction. Uni will edit the message whenever someone gains xp!"
 }

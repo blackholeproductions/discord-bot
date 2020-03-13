@@ -1,6 +1,14 @@
 const util = require(`${__basedir}/util/util.js`);
 var activeCooldowns = {};
 var globalCooldowns = {};
+var storeItemType = {
+  item: {
+    description: "Adds an item to a user's inventory"
+  },
+  role: {
+    description: "Gives a user a role"
+  }
+};
 module.exports = {
   get(guild, user) {
     var path = util.json.getServerJSON(guild);
@@ -143,7 +151,6 @@ module.exports = {
   addGlobal(guild, user, amount, skipCooldown) {
     if (this.hasGlobalCooldown(user) && !skipCooldown) return; // stop user from gaining currency if a cooldown is active unless it has been specified that the cooldown should be skipped
     if (!util.xp.isTrusted(guild)) return;
-    console.log(`add ${amount} to ${user}`)
     this.addGlobalCooldown(user);
     this.setGlobal(user, this.getGlobal(user)+amount);
   },
@@ -182,6 +189,69 @@ module.exports = {
     embed.setFooter(`Page ${page}`);
     embed.setTimestamp();
     return embed;
+  },
+  addStoreItem(guildID, price, itemName, type, description, extraData) {
+    if (storeItemType[type] == undefined) return 'Invalid type';
+    if (isNaN(price) || price <= 0) return 'Invalid price';
+    if (itemName == "" || itemName == undefined) return 'Invalid name';
+    if (description == "" || description == undefined) return 'Invalid description';
+    var path = util.json.getServerJSON(guildID);
+    var data = util.json.JSONFromFile(path);
+    if (data.store == undefined) data.store = {};
+    if (data.store[itemName] !== undefined) return 'That item already exists';
+    switch(type) {
+      case "item":
+        data.store[itemName] = {
+          price: price,
+          type: type,
+          description: description
+        }
+        return 'Added to store';
+        break;
+      case "role":
+        if (extraData.roleID == undefined || client.guilds.cache.get(guildID).roles.cache.get(extraData.roleID) == undefined) return 'Invalid role';
+        data.store[itemName] = {
+          price: price,
+          type: type,
+          description: description,
+          roleID: extraData.roleID
+        }
+        return 'Added to store';
+        break;
+      default:
+        return 'Invalid type';
+    }
     util.json.writeJSONToFile(data, path);
+  },
+  removeStoreItem(guildID, itemName) {
+    var path = util.json.getServerJSON(guildID);
+    var data = util.json.JSONFromFile(path);
+    if (data.store[itemName] !== undefined) {
+      delete date.store[itemName];
+      return `Successfully deleted ${itemName}`;
+    } else {
+      return `Invalid item ${itemName}`;
+    }
+  },
+  listStoreItems(guildID, page) {
+    var path = util.json.getServerJSON(guildID),
+        data = util.json.JSONFromFile(path),
+        i = 0,
+        pageSize = 10,
+        output = "",
+        guild = client.guilds.cache.get(guildID),
+        embed = new Discord.MessageEmbed();
+    if (data.store == undefined) data.store = {};
+    if (data.store == {}) return 'No store items found for this server';
+    embed.setTitle(`Store for ${guild.name}`);
+    for (var item in data.store) {
+      i++;
+      if (i < (page-1)*pageSize+(page-1)) continue; // Page system
+      if (i > page*pageSize) break;
+      embed.addField(`${item} - ${data.store[item].price}${this.getCurrencySymbol(guildID) ? this.getCurrencySymbol(guildID) : ` ${data.store[price] == 1 ? this.getCurrencyName(guildID) : `${this.getCurrencyName(guildID)}s`}`}`,
+      `${data.store[item].description} ${data.store[item].type == 'role' ? `<@&${data.store[item].roleID}>` : ""}`);
+    }
+    embed.setFooter(`Page ${page}`);
+    return embed;
   }
 }

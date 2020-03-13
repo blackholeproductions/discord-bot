@@ -74,6 +74,9 @@ function updateMessage(messageID, type, page) {
     case "questionsList":
       message.edit(util.questions.listQuestions(message.guild.id, page));
       break;
+    case "serverStoreItems":
+      message.edit(util.currency.listStoreItems(message.guild.id, page));
+      break;
     default:
       message.edit(`something has gone horribly wrong.\n\`\`\`${messages[reaction.message.id]}\`\`\``);
       break;
