@@ -21,7 +21,7 @@ ${util.modules.isEnabled("xp-roles", message.guild.id) ? `*${util.numberWithComm
   embed.addField(`XP`, `**${xpString}** xp`, true);
   embed.addField(`Level`, `Level ${level} ${util.modules.isEnabled("xp-roles", message.guild.id) ? ` <@&${util.xp.getHighestRole(message.guild.id, level)}>` : ""}`, true);
   var rank = util.xp.getLeaderboardRank(message.guild.id, user.id) || 1;
-  embed.addField(`Rank`, `**#${rank}** ${rank !== 1 ? `(${util.numberWithCommas(util.xp.getXPatRank(message.guild.id, rank-1)-xp)} xp to **#${rank-1}**)` : ""}`, true);
+  embed.addField(`Rank`, `**#${rank}**/${user.bot ? util.xp.getTotalRank(message.guild.id, true) : util.xp.getTotalRank(message.guild.id)} ${rank !== 1 ? `(${util.numberWithCommas(util.xp.getXPatRank(message.guild.id, rank-1)-xp)} xp to **#${rank-1}**)` : ""}`, true);
   message.channel.send(embed);
 }
 exports.args = args;

@@ -28,7 +28,7 @@ function addXP(user, guild, amount, skipCooldown) {
   if (data.xp.history[day] == undefined) data.xp.history[day] = {}; // same as above except with individual days
   if (data.xp.history[day][user] == undefined) data.xp.history[day][user] = {};
   data.xp.history[day][user].amount = getXP(user, guild); // add xp to current day (for activity command)
-  data.xp.history[day][user].rank = getLeaderboardRank(guild, user);
+  data.xp.history[day][user].rank = `${getLeaderboardRank(guild, user)}/${getTotalRank(guild, client.users.cache.get(user).bot)}`;
   util.json.writeJSONToFile(data, path); // Write to file
 
   addXPCooldown(user); // Add XP cooldown so that the user can't spam and earn XP
@@ -204,6 +204,26 @@ function getLeaderboardRank(guildID, userID) {
     return i;
   }
   return "Unknown Rank";
+}
+function getTotalRank(guildID, bot) {
+  var path     = util.json.getServerJSON(guildID),
+      data     = util.json.JSONFromFile(path);
+  // Sort by putting in array and using the sort() function
+  var array = [];
+  for (var xp in data.xp) {
+    if (isNaN(parseInt(xp))) continue;
+    array.push({ id: xp, xp: data.xp[xp] });
+  }
+  array.sort(function(a, b) {
+    return b.xp - a.xp;
+  });
+  var i = 0;
+  for (var object in array) {
+    if (isNaN(parseInt(array[object].id))) continue; // Handle non-users in xp object
+    if (client.guilds.cache.get(guildID).members.cache.get(array[object].id) !== undefined && client.guilds.cache.get(guildID).members.cache.get(array[object].id).user.bot && !bot) continue; // Skip user if they are a bot
+    i++;
+  }
+  return i;
 }
 
 function getXPatRank(guildID, rank) {
@@ -668,6 +688,7 @@ function enabledXPGain(guildID, channelID) {
   return false;
 }
 
+exports.getTotalRank = getTotalRank;
 exports.getXPGainedAvg = getXPGainedAvg;
 exports.getXPatRank = getXPatRank;
 exports.enabledXPGain = enabledXPGain;
