@@ -1,7 +1,8 @@
-const desc = "Run this command for fast leaderboard setup, preferably in an empty channel.";
-const execute = async (message, command) => {
-  const m = await message.channel.send("Waiting for ID...");
-  m.edit(`Do \`${util.getServerPrefix(message.guild.id)}leaderboardset ${m.id} ${m.channel.id}\` to set this as the leaderboard message.`);
+module.exports = {
+  desc: "Run this command for fast leaderboard setup, preferably in an empty channel.",
+  async execute(message, command) {
+    const m = await message.channel.send("Waiting for xp update...");
+    util.xp.setLeaderboardMessage(m.guild.id, m.channel.id, m.id);
+    message.delete({ timeout: 1000 });
+  }
 }
-exports.desc = desc;
-exports.execute = execute;

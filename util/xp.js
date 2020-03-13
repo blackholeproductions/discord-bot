@@ -663,7 +663,7 @@ function enabledXPGain(guildID, channelID) {
   var path = util.json.getServerJSON(guildID),
       data = util.json.JSONFromFile(path);
   if (data.xp == undefined) return false;
-  if (data.xp.xpBlacklist == undefined) return false;
+  if (data.xp.xpBlacklist == undefined) return true;
   if (data.xp.xpBlacklist.indexOf(channelID) == -1) return true;
   return false;
 }
