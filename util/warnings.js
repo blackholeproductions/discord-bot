@@ -32,5 +32,14 @@ module.exports = {
          .setDescription(output)
          .setTimestamp();
     return embed;
-  }
+  },
+  clear(guildID, userID) {
+    var path = util.json.getServerJSON(guildID),
+        data = util.json.JSONFromFile(path);
+    if (data.warnings == undefined) data.warnings = {};
+    if (data.warnings[userID] == undefined) data.warnings[userID] = [];
+    for (var index in data.warnings[userID]) {
+      this.remove(guildID, userID, index+1);
+    }
+  },
 };

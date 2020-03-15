@@ -15,6 +15,8 @@ module.exports = {
       return;
     }
     util.warnings.add(message.guild.id, user.id, warning);
+    user.send(`You have been warned in ${message.guild.name} for: ${warning}`)
+      .catch(console.error);
     message.channel.send(`Warned ${user.username} for ${warning}`);
   }
 }

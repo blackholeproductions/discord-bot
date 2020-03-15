@@ -134,7 +134,7 @@ function execute(startmsg) {
     if (util.modules.isEnabled("counting", message.guild.id)) { // Handle counting module
       if (util.counting.isChannel(message.guild.id, message.channel.id)) {
         if (!await util.counting.isValidCount(message.guild.id, message.content, message.author.id)) {
-          message.delete({ timeout: 1000 }); // Delete message if it is not valid
+          message.delete({ timeout: 0 }); // Delete message if it is not valid
         } else {
           if (util.xp.isEnabled(message.guild.id)) {
             util.xp.addXP(message.author.id, message.guild.id, util.xp.getLevel(message.author.id, message.guild.id)); // Add 5 xp for counting
@@ -147,11 +147,18 @@ function execute(startmsg) {
     if (util.xp.isEnabled(message.guild.id)) { // Handle xp module
       if (util.xp.enabledXPGain(message.guild.id, message.channel.id)) { // If xp is enabled in channel
         var levelBefore = util.xp.getLevel(message.author.id, message.guild.id);
+        var rankBefore = util.xp.getLeaderboardRank(message.guild.id, message.author.id);
         util.xp.addXP(message.author.id, message.guild.id); // Add default xp
         var levelAfter = util.xp.getLevel(message.author.id, message.guild.id);
+        var rankAfter = util.xp.getLeaderboardRank(message.guild.id, message.author.id);
         if (levelAfter > levelBefore && message.author.id !== client.user.id) {
           message.channel.send(`**${message.member.nickname ? message.member.nickname : message.author.username}** has advanced to level **${levelAfter}**!`);
           util.xp.addLevelUpMessage(message.guild.id, message.channel.id, message.id, message.author.id, levelAfter, message.content);
+        }
+        if (rankAfter > rankBefore && message.author.id !== client.user.id) {
+          message.channel.send(`**${message.member.nickname ? message.member.nickname : message.author.username}** has regressed to rank **#${rankAfter}**!`);
+        } else if (rankAfter < rankBefore && message.author.id !== client.user.id) {
+          message.channel.send(`**${message.member.nickname ? message.member.nickname : message.author.username}** has advanced to rank **#${rankAfter}**.`);
         }
       }
     }

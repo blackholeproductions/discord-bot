@@ -1,3 +1,4 @@
 {
-  "description": "Global currency across servers"
+  "description": "Global currency across servers",
+  "enabled_by_default": true
 }
