@@ -1,4 +1,4 @@
-const util = require(`${__basedir}/util/util.js`);
+
 var activeCooldowns = {};
 var globalCooldowns = {};
 var storeItemType = {
@@ -206,7 +206,8 @@ module.exports = {
           type: type,
           description: description
         }
-        return 'Added to store';
+        util.json.writeJSONToFile(data, path);
+        return 'Added item to store';
         break;
       case "role":
         if (extraData.roleID == undefined || client.guilds.cache.get(guildID).roles.cache.get(extraData.roleID) == undefined) return 'Invalid role';
@@ -216,12 +217,13 @@ module.exports = {
           description: description,
           roleID: extraData.roleID
         }
-        return 'Added to store';
+        util.json.writeJSONToFile(data, path);
+        return 'Added role to store';
         break;
       default:
         return 'Invalid type';
     }
-    util.json.writeJSONToFile(data, path);
+
   },
   removeStoreItem(guildID, itemName) {
     var path = util.json.getServerJSON(guildID);

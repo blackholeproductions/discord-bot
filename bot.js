@@ -1,4 +1,7 @@
 function execute(startmsg) {
+  const path    = require('path'),
+        fs      = require('fs'),
+        md5     = require('md5');
   global.Discord = require('discord.js');
   global.__basedir = __dirname.replace(/\\/g, "/"); // global variable that stores base directory
   global.datapath = `${__basedir}/data`;
@@ -7,12 +10,25 @@ function execute(startmsg) {
   global.modules = {};
   global.usermodules = {};
   global.config = require(`${__basedir}/config.js`);
-  global.util = require(`${__basedir}/util/util.js`);
   global.client = new Discord.Client();
-  const path    = require('path'),
-        fs      = require('fs'),
-        md5     = require('md5');
-
+  global.util = {
+  modules: require('./util/modules.js'),
+    json: require('./util/json.js'),
+    xp: require('./util/xp.js'),
+    counting: require('./util/counting.js'),
+    pages: require('./util/pages.js'),
+    currency: require('./util/currency.js'),
+    marriage: require('./util/marriage.js'),
+    todo: require('./util/todo.js'),
+    timers: require('./util/timers.js'),
+    moderation: require('./util/moderation.js'),
+    joinleave: require('./util/joinleave.js'),
+    questions: require('./util/questions.js'),
+    stats: require('./util/game/stats.js'),
+    events: require('./util/game/events.js'),
+    warnings: require('./util/warnings.js'),
+    general: require('./util/general.js')
+  }
   var command = require(`${__basedir}/command.js`);
   // Get all .js files recursively in the ./commands/ directory and register them as a command
   var filePath = path.join(__dirname, "commands");
@@ -100,7 +116,7 @@ function execute(startmsg) {
   util.json.writeJSONToFile(timeJson, timeJsonPath);
 
   client.on('ready', () => {
-    var startMessage = `**${util.timestamp()}** Logged in as *${client.user.tag}*!\nI'm in ${client.guilds.cache.size} servers with ${client.users.cache.size} users in ${client.channels.cache.size} channels serving ${util.cmdCount()} commands!\nStart message: ${startmsg}`;
+    var startMessage = `**${util.general.timestamp()}** Logged in as *${client.user.tag}*!\nI'm in ${client.guilds.cache.size} servers with ${client.users.cache.size} users in ${client.channels.cache.size} channels serving ${util.general.cmdCount()} commands!\nStart message: ${startmsg}`;
     client.guilds.cache.get("587038554539032577").channels.cache.get("612021603261480969").send(startMessage); // send message to bot-brain channel
     // Check all servers the bot is in and see if they have a designated file. If they don't, make one.
     client.guilds.cache.array().forEach((item, i) => {
@@ -122,14 +138,14 @@ function execute(startmsg) {
     // functions to run on startup
     util.xp.startXPCooldowns();
     util.currency.startCooldowns();
-    util.incrementVersion();
+    util.general.incrementVersion();
     util.timers.startTimers();
     util.events.tick();
   });
 
   client.on('message', async message => {
     if (message.guild == null) return;
-    console.log(`${util.timestamp()} ${message.author.tag} (${message.guild.name} - #${message.channel.name}): ${message.content}`); // log message
+    console.log(`${util.general.timestamp()} ${message.author.tag} (${message.guild.name} - #${message.channel.name}): ${message.content}`); // log message
     // COUNTING
     if (util.modules.isEnabled("counting", message.guild.id)) { // Handle counting module
       if (util.counting.isChannel(message.guild.id, message.channel.id)) {
@@ -187,7 +203,7 @@ function execute(startmsg) {
     if (util.modules.isEnabledUser("global-currency", message.author.id)) {
       if (util.xp.enabledXPGain(message.guild.id, message.channel.id)) util.currency.addGlobal(message.guild.id, message.author.id, 1);
     }
-    var prefix = util.getServerPrefix(message.guild.id); // get server prefix
+    var prefix = util.general.getServerPrefix(message.guild.id); // get server prefix
     // Check if message contains prefix (with the exception of the u!setprefix command)
     if (message.content.startsWith(config.prefix)) { // Check for u!setprefix
       var cmdName = message.content.split(config.prefix)[1].split(" ")[0];
@@ -199,7 +215,7 @@ function execute(startmsg) {
     if (message.content.startsWith(prefix)) { // Check for server-specific prefix
       var cmdName = message.content.slice(prefix.length, message.content.length).split(" ")[0];
       // Check if command name is a valid command
-      var selectedCommand = util.getCommandFromAlias(cmdName);
+      var selectedCommand = util.general.getCommandFromAlias(cmdName);
       if (selectedCommand != undefined) {
         if (selectedCommand.module != undefined) { // check if command is a module command
           if (util.modules.isEnabled(selectedCommand.module, message.guild.id) || util.modules.isEnabledUser(selectedCommand.module, message.author.id)) { // Check if valid for server or user

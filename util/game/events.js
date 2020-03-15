@@ -1,9 +1,9 @@
-const util = require(`${__basedir}/util/util.js`);
+
 const fs = require('fs');
 var events = ['death'];
 module.exports = {
   fireEvent(eventName, extraData) {
-    if (eventName !== "checkRevivals" && eventName !== "regenHealth") util.log(`${eventName} event fired. ${JSON.stringify(extraData, null, 2) ? `\n\`\`\`${JSON.stringify(extraData, null, 2)}\`\`\`` : ""}`);
+    if (eventName !== "checkRevivals" && eventName !== "regenHealth") util.general.log(`${eventName} event fired. ${JSON.stringify(extraData, null, 2) ? `\n\`\`\`${JSON.stringify(extraData, null, 2)}\`\`\`` : ""}`);
     switch(eventName) {
       case 'death':
         var path = `${__basedir}/data/game/revivals.json`,
@@ -72,11 +72,11 @@ module.exports = {
   },
   tick() {
     setInterval(function() {
-      //util.log("Game tick.");
+      //util.general.log("Game tick.");
       var regens = util.events.fireEvent("regenHealth");
-      if (regens !== 0) util.log(`Regenerated ${regens} users`);
+      if (regens !== 0) util.general.log(`Regenerated ${regens} users`);
       var revivals = util.events.fireEvent("checkRevivals");
-      if (revivals !== undefined) util.log(revivals);
+      if (revivals !== undefined) util.general.log(revivals);
     }, 30000);
   }
 }

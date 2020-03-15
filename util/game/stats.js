@@ -1,4 +1,4 @@
-const util = require(`${__basedir}/util/util.js`);
+
 var stats = {
   hp: {
     default: 100
@@ -19,7 +19,7 @@ module.exports = {
     for (var stat in stats) {
       if (data.game.stats[stat] == undefined) data.game.stats[stat] = stats[stat].default;
     }
-    util.log(`Gave ${userID} default stats`);
+    util.general.log(`Gave ${userID} default stats`);
     util.json.writeJSONToFile(data, path);
   },
   getStats(userID) {
@@ -35,7 +35,7 @@ module.exports = {
     }
     var stats = data.game.stats;
     if (user) embed.setAuthor(`${user.username}`, `${user.displayAvatarURL()}`);
-    embed.addField("Health", `${stats.hp}/${stats.max_hp} (${Math.round((stats.hp/stats.max_hp)*100)}%) ${util.progressBar((stats.hp/stats.max_hp)*100, 10)}`);
+    embed.addField("Health", `${stats.hp}/${stats.max_hp} (${Math.round((stats.hp/stats.max_hp)*100)}%) ${util.general.progressBar((stats.hp/stats.max_hp)*100, 10)}`);
     embed.addField("Skill Points", `${stats.skill_points}`);
     return embed;
   },

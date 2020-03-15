@@ -12,7 +12,7 @@ module.exports = {
     }
     var role;
     if (isNaN(parseInt(name))) {
-      role = message.guild.roles.find("name", name); // if it's a string, get by name
+      role = message.guild.roles.cache.find(role => role.name === name); // if it's a string, get by name
     } else {
       role = message.guild.roles.cache.get(name); // if it's a number, get by ID
     }

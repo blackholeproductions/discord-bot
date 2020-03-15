@@ -1,4 +1,4 @@
-const util = require(`${__basedir}/util/util.js`);
+
 
 module.exports = {
   add(guildID, userID, warning) {
@@ -26,7 +26,7 @@ module.exports = {
     if (data.warnings[userID] == undefined) data.warnings[userID] = [];
     for (var index in data.warnings[userID]) {
       var warning = data.warnings[userID][index];
-      output += `${parseInt(index)+1}. ${warning}`;
+      output += `${parseInt(index)+1}. ${warning}\n`;
     }
     embed.setTitle(`${client.users.cache.get(userID).username}'s warnings`)
          .setDescription(output)

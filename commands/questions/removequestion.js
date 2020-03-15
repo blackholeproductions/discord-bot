@@ -10,7 +10,7 @@ module.exports = {
       return;
     }
     if (command.getArgs().length > 0) {
-      util.questions.removeQuestion(message.guild.id, index);
+      util.questions.removeQuestion(message.guild.id, index-1);
       message.author.send(`Removed question at index ${index}`);
     } else {
       message.channel.send("You must specify an index to ask");

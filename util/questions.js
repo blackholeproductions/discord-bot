@@ -1,4 +1,4 @@
-const util = require(`${__basedir}/util/util.js`);
+
 module.exports = {
   setAskChannel(guildID, channelID) {
     var path = util.json.getServerJSON(guildID);
