@@ -8,8 +8,7 @@ module.exports = {
       message.channel.send("You must specify a valid user.");
       return;
     }
-    const m = await message.channel.send("Getting activity...");
-    m.edit(util.xp.getXPHistory(message.guild.id, user.id, page));
+    const m = await message.channel.send(util.xp.getXPHistory(message.guild.id, user.id, page));
     util.pages.addPageMessage(m.id, m.channel.id, message.author.id, page, "activity", { id: user.id });
   }
 }
