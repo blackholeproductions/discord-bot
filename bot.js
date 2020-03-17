@@ -132,7 +132,7 @@ function execute(startmsg) {
         util.json.writeJSONToFile(defaultJson, file);
       }
     });
-    client.user.setPresence({ activity: { name: 'u!help' } })
+    client.user.setPresence({ activity: { name: 'u!help // u!prefix // u!setprefix', type: "LISTENING" } })
       .then(console.log)
       .catch(console.error);
     // functions to run on startup
@@ -145,7 +145,7 @@ function execute(startmsg) {
 
   client.on('message', async message => {
     if (message.guild == null) return;
-    console.log(`${util.general.timestamp()} ${message.author.tag} (${message.guild.name} - #${message.channel.name}): ${message.content}`); // log message
+    console.log(`${util.general.timestamp()} (${message.guild.name} - #${message.channel.name}) ${message.author.tag}: ${message.content}`); // log message
     // COUNTING
     if (util.modules.isEnabled("counting", message.guild.id)) { // Handle counting module
       if (util.counting.isChannel(message.guild.id, message.channel.id)) {
@@ -167,14 +167,16 @@ function execute(startmsg) {
         util.xp.addXP(message.author.id, message.guild.id); // Add default xp
         var levelAfter = util.xp.getLevel(message.author.id, message.guild.id);
         var rankAfter = util.xp.getLeaderboardRank(message.guild.id, message.author.id);
-        if (levelAfter > levelBefore && message.author.id !== client.user.id) {
+        if (levelAfter > levelBefore && message.author.id !== client.user.id) { // Levelup messages
           message.channel.send(`**${message.member.nickname ? message.member.nickname : message.author.username}** has advanced to level **${levelAfter}**!`);
           util.xp.addLevelUpMessage(message.guild.id, message.channel.id, message.id, message.author.id, levelAfter, message.content);
         }
-        if (rankAfter > rankBefore && message.author.id !== client.user.id) {
-          message.channel.send(`**${message.member.nickname ? message.member.nickname : message.author.username}** has regressed to rank **#${rankAfter}**!`);
+        if (rankAfter > rankBefore && message.author.id !== client.user.id) { // Rankup messages
+          var userBehind = client.users.cache.get(util.xp.getUserAtRank(message.guild.id, rankAfter));
+          message.channel.send(`**${message.member.nickname ? message.member.nickname : message.author.username}** has regressed to rank **#${rankAfter}**, falling behind ${userBehind.username}`);
         } else if (rankAfter < rankBefore && message.author.id !== client.user.id) {
-          message.channel.send(`**${message.member.nickname ? message.member.nickname : message.author.username}** has advanced to rank **#${rankAfter}**.`);
+          var userAhead = client.users.cache.get(util.xp.getUserAtRank(message.guild.id, rankBefore));
+          message.channel.send(`**${message.member.nickname ? message.member.nickname : message.author.username}** has advanced to rank **#${rankAfter}**, passing ${userAhead.username}`);
         }
       }
     }
@@ -207,7 +209,7 @@ function execute(startmsg) {
     // Check if message contains prefix (with the exception of the u!setprefix command)
     if (message.content.startsWith(config.prefix)) { // Check for u!setprefix
       var cmdName = message.content.split(config.prefix)[1].split(" ")[0];
-      if (cmdName == "setprefix") {
+      if (cmdName == "setprefix" || cmdName == "prefix") {
         command.set(message, config.prefix);
         commands[cmdName].execute(message, command);
       }

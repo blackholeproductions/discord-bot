@@ -1,5 +1,3 @@
-}
-
 module.exports = {
   /*
   ** propose(guild, asker, target)

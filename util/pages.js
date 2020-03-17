@@ -78,6 +78,9 @@ module.exports = {
       case "serverStoreItems":
         message.edit(util.currency.listStoreItems(message.guild.id, page));
         break;
+      case "reminderList":
+        message.edit(util.timers.listReminders(message.author.id, page));
+        break;
       default:
         message.edit(`something has gone horribly wrong.\n\`\`\`${messages[reaction.message.id]}\`\`\``);
         break;

@@ -245,7 +245,27 @@ module.exports = {
     if (!array[rank-1]) return 0;
     return array[rank-1].xp || 0;
   },
+  getUserAtRank(guildID, rank) {
+    var path     = util.json.getServerJSON(guildID),
+        data     = util.json.JSONFromFile(path);
+    // Sort by putting in array and using the sort() function
+    var array = [];
+    for (var xp in data.xp) {
+      if (isNaN(parseInt(xp))) continue;
+      array.push({ id: xp, xp: data.xp[xp] });
+    }
+    for (var object in array) {
+      if (isNaN(parseInt(array[object].id))) {delete array[object]; continue;}
+      if (array[object].id == "672280373065154569") {delete array[object]; continue;}
+      if (client.guilds.cache.get(guildID).members.cache.get(array[object].id) !== undefined && client.guilds.cache.get(guildID).members.cache.get(array[object].id).user.bot) {delete array[object]; continue;}
+    }
+    array.sort(function(a, b) {
+      return b.xp - a.xp;
+    });
 
+    if (!array[rank-1]) return client.user.id;
+    return array[rank-1].id;
+  },
   /*
   ** setLeaderboardMessage(guildID, channelid, messageid)
   ** Description: set the message id to edit the leaderboard into

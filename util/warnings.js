@@ -1,5 +1,3 @@
-
-
 module.exports = {
   add(guildID, userID, warning) {
     var path = util.json.getServerJSON(guildID),
@@ -39,7 +37,7 @@ module.exports = {
     if (data.warnings == undefined) data.warnings = {};
     if (data.warnings[userID] == undefined) data.warnings[userID] = [];
     for (var index in data.warnings[userID]) {
-      this.remove(guildID, userID, index+1);
+      this.remove(guildID, userID, index);
     }
   },
 };

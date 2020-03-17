@@ -1,4 +1,3 @@
-
 var activeTimers = {};
 var activeReminders = {};
 module.exports = {
@@ -70,6 +69,27 @@ module.exports = {
     if (activeReminders[userID] == undefined) return;
     if (activeReminders[userID][date] == undefined) return;
     delete activeReminders[userID][date];
+  },
+  listReminders(userID, page) {
+    var output = "",
+        pageSize = 10,
+        i = 0,
+        embed = new Discord.MessageEmbed();
+    page = page || 1;
+    for (var date in activeReminders[userID]) {
+      if (date == "Invalid Date") {
+        delete activeReminders[userID][date];
+        continue;
+      }
+      i++;
+      if (i < (page-1)*pageSize) continue;
+      if (i > page*pageSize) break;
+      output += `${i}. **${activeReminders[userID][date]}** - ${date}\n`;
+    }
+    embed.setTitle(`${client.users.cache.get(userID).username}'s reminders`)
+         .setDescription(output)
+         .setTimestamp();
+    return embed;
   },
   remind(userID, date) {
     var user = client.users.cache.get(userID);
