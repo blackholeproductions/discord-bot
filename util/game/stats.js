@@ -1,4 +1,3 @@
-
 var stats = {
   hp: {
     default: 100

@@ -1,4 +1,3 @@
-
 const fs = require('fs');
 var events = ['death'];
 module.exports = {
@@ -38,7 +37,11 @@ module.exports = {
             this.fireEvent("setDamaged", { userID: extraData.userID });
           } else if (extraData.newValue == util.stats.getStat(extraData.userID, "max_hp")) {
             this.fireEvent("setUndamaged", { userID: extraData.userID });
+          } else if (extraData.newValue > util.stats.getStat(extraData.userID, "max_hp")) {
+            util.updateStat(extraData.userID, extraData.stat, util.stats.getStat(extraData.userID, "max_hp"));
           }
+        } else if (extraData.stat == "skill_points") {
+
         }
         break;
       case "setDamaged":

@@ -393,7 +393,7 @@ module.exports = {
   getHighestRole(guildID, level) {
     var path = util.json.getServerJSON(guildID),
         data = util.json.JSONFromFile(path),
-        output = "`No role`";
+        output = "";
     if (data.xp.roles == undefined) data.xp.roles = {}; // Add roles object if it doesn't already exist
     for (var role in data.xp.roles) {
       if (level >= data.xp.roles[role]) {
@@ -409,7 +409,7 @@ module.exports = {
   getNextHighestRole(guildID, level) {
     var path = util.json.getServerJSON(guildID),
         data = util.json.JSONFromFile(path),
-        output = "`No role`";
+        output = "";
     if (data.xp == undefined) data.xp = {};
     if (data.xp.roles == undefined) data.xp.roles = {}; // Add roles object if it doesn't already exist
     for (var role in data.xp.roles) {

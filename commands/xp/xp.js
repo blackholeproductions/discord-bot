@@ -15,9 +15,9 @@ module.exports = {
     embed.setTitle(message.guild.members.cache.get(user.id).nickname || user.username);
 
     embed.setDescription(`*+${util.general.numberWithCommas(xpGained)} xp* gained today
-  *+${util.general.numberWithCommas(xpAvg)} average xp* gained over last week
-  *${util.general.numberWithCommas(util.xp.getMinXP(level+1)-xp)} xp* until Level ${level+1} (${Math.round((util.xp.getMinXP(level+1)-xp)/xpAvg)} day${Math.round((util.xp.getMinXP(level+1)-xp)/xpAvg) !== 1 ? "s" : ""})
-  ${util.modules.isEnabled("xp-roles", message.guild.id) ? `*${util.general.numberWithCommas(util.xp.getMinimumXPForRole(message.guild.id, nextHighestRole)-xp)} xp* until <@&${nextHighestRole}> ` : ""} (${Math.round((util.xp.getMinimumXPForRole(message.guild.id, nextHighestRole)-xp)/xpAvg)} day${Math.round((util.xp.getMinimumXPForRole(message.guild.id, nextHighestRole)-xp)/xpAvg) !== 1 ? "s" : ""})`);
+*+${util.general.numberWithCommas(xpAvg)} average xp* gained over last week
+*${util.general.numberWithCommas(util.xp.getMinXP(level+1)-xp)} xp* until Level ${level+1} (${Math.round((util.xp.getMinXP(level+1)-xp)/xpAvg)} day${Math.round((util.xp.getMinXP(level+1)-xp)/xpAvg) !== 1 ? "s" : ""})
+${nextHighestRole !== "" ? `${util.modules.isEnabled("xp-roles", message.guild.id) ? `*${util.general.numberWithCommas(util.xp.getMinimumXPForRole(message.guild.id, nextHighestRole)-xp)} xp* until <@&${nextHighestRole}> ` : ""} (${Math.round((util.xp.getMinimumXPForRole(message.guild.id, nextHighestRole)-xp)/xpAvg)} day${Math.round((util.xp.getMinimumXPForRole(message.guild.id, nextHighestRole)-xp)/xpAvg) !== 1 ? "s" : ""})` : ""}`);
 
     embed.addField(`XP`, `**${xpString}** xp`, true);
     embed.addField(`Level`, `Level ${level} ${util.modules.isEnabled("xp-roles", message.guild.id) ? ` <@&${util.xp.getHighestRole(message.guild.id, level)}>` : ""}`, true);
